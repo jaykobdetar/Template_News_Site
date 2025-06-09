@@ -3,7 +3,7 @@
 A beautifully designed, fully responsive news website template with automated content management system. Built with modern web technologies and following 2025 design trends.
 
 > **⚠️ Disclaimer**: This is a demonstration project and template, not a real news website. All content and articles are fictional examples for showcase purposes.
-
+View the site here: jaykobdetar.github.io
 ![Website Preview](screenshots/article.png)
 ![Website Preview](screenshots/home.png)
 ![Website Preview](screenshots/search.png)
