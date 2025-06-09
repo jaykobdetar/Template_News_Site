@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entertainment - Category | Influencer News</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hero-title { font-family: 'Playfair Display', serif; }
+        .category-entertainment { color: #f59e0b; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-indigo-900 text-white sticky top-0 z-50 shadow-2xl">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-indigo-400 to-purple-600 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-2xl font-bold text-white">IN</span>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold hero-title">Influencer News</h1>
+                    <p class="text-xs text-indigo-200">Breaking stories • Real insights</p>
+                </div>
+            </div>
+            <nav class="hidden md:block">
+                <ul class="flex space-x-8">
+                    <li><a href="../../index.html" class="hover:text-indigo-200 transition font-medium">Home</a></li>
+                    <li><a href="../../search.html" class="hover:text-indigo-200 transition font-medium">Search</a></li>
+                    <li><a href="../../authors.html" class="hover:text-indigo-200 transition font-medium">Authors</a></li>
+                    <li><a href="../categories.html" class="hover:text-indigo-200 transition font-medium text-indigo-200">Categories</a></li>
+                    <li><a href="../trending.html" class="hover:text-indigo-200 transition font-medium">Trending</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Category Hero -->
+    <section class="bg-gradient-to-br from-orange-700 via-orange-600 to-orange-500 text-white py-20">
+        <div class="container mx-auto px-4 text-center">
+            <div class="text-8xl mb-6">🎬</div>
+            <h1 class="text-5xl font-bold mb-4 hero-title">Entertainment</h1>
+            <p class="text-xl text-white/90 max-w-3xl mx-auto mb-8">
+                Celebrity news, drama, and exclusive interviews from the influencer world
+            </p>
+            <div class="flex gap-4 justify-center">
+                <span class="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full">
+                    📊 0 Articles
+                </span>
+                <span class="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full">
+                    🔥 Trending Category
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        <!-- About This Category -->
+        <div class="bg-white rounded-2xl shadow-lg p-8 mb-12">
+            <h2 class="text-3xl font-bold mb-6 hero-title">About Entertainment</h2>
+            <div class="prose prose-lg max-w-none text-gray-700">
+                <p class="mb-4">The Entertainment category is your destination for all the latest celebrity news, creator drama, and exclusive interviews from the influencer world. We cover everything from high-profile collaborations to controversial feuds that shape the digital landscape.</p>
+<p class="mb-4">Our entertainment coverage includes:</p>
+<p class="mb-4">Celebrity Collaborations - When creators team up with traditional celebrities or each other, we&#x27;re there to cover the partnerships that matter. From music videos to brand campaigns, we track the biggest collabs in the industry.</p>
+<p class="mb-4">Creator Drama - The influencer world is never short on drama. We provide balanced coverage of controversies, feuds, and reconciliations, always focusing on the facts while respecting all parties involved.</p>
+<p class="mb-4">Exclusive Interviews - Our team secures sit-downs with the biggest names in the creator economy, bringing you insights and stories you won&#x27;t find anywhere else.</p>
+<p class="mb-4">Relationship News - From creator couples to friendship dynamics, we cover the relationships that fans care about most.</p>
+<p class="mb-4">Platform Drama - When creators clash with platforms or each other over algorithm changes, monetization, or content policies, we break down what it means for the community.</p>
+
+            </div>
+            
+            
+            <div class="mt-8 pt-8 border-t border-gray-200">
+                <h3 class="text-xl font-bold mb-4">Related Topics</h3>
+                <div class="flex flex-wrap gap-2">
+        <span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">celebrity</span>
+<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">drama</span>
+<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">interviews</span>
+<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">collaborations</span>
+<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">feuds</span>
+<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">relationships</span>
+
+                </div>
+            </div>
+        
+        </div>
+
+        <!-- Articles in Category -->
+        <section>
+            <h2 class="text-3xl font-bold mb-8 hero-title">Latest in Entertainment</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="categoryArticles">
+                <!-- Articles will be dynamically loaded here -->
+                <div class="bg-gray-100 rounded-xl p-8 text-center text-gray-500">
+                    <p>Articles in this category will appear here after integration.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Categories -->
+        <section class="mt-16">
+            <h2 class="text-3xl font-bold mb-8 hero-title">Explore More Categories</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="relatedCategories">
+                <!-- Related categories will be loaded here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-12 mt-20">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2024 Influencer News. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Load articles for this category
+        document.addEventListener('DOMContentLoaded', function() {
+            // This would be populated by the article integrator
+            console.log('Loading articles for category: entertainment');
+        });
+    </script>
+</body>
+</html>

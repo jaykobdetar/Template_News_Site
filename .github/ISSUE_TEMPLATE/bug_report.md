@@ -1,8 +1,8 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ''
-labels: ''
+title: '[BUG] '
+labels: bug
 assignees: ''
 
 ---
@@ -23,16 +23,33 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**System Information:**
+ - OS: [e.g. Windows 10, macOS 12.0, Ubuntu 20.04]
+ - Python Version: [e.g. 3.9.2]
+ - Project Version: [e.g. 1.0.0]
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**Content Information (if applicable):**
+ - Content Type: [e.g. Articles, Authors, Categories, Trending]
+ - File Format: [attach sample .txt file if relevant]
+ - Database State: [check data/*.json files for corruption]
+
+**Error Messages**
+If applicable, paste any error messages from:
+- Integration Manager log panel
+- Command line output
+- Console/terminal errors
+
+```
+[Paste error messages here]
+```
 
 **Additional context**
 Add any other context about the problem here.
+
+**Attempted Solutions**
+List any troubleshooting steps you've already tried:
+- [ ] Restarted the application
+- [ ] Ran sync_site.py
+- [ ] Checked file permissions
+- [ ] Verified content file format
+- [ ] Other: _______________

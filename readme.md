@@ -1,224 +1,197 @@
-# 📰 Influencer News - Modern News Website Template
+# 📰 Influencer News - Content Management System
 
-A beautifully designed, fully responsive news website template with automated content management system. Built with modern web technologies and following 2025 design trends.
-[View the demo](https://jaykobdetar.github.io)
-> **⚠️ Disclaimer**: This is a demonstration project and template, not a real news website. All content and articles are fictional examples for showcase purposes.
-![Website Preview](screenshots/article.png)
-![Website Preview](screenshots/home.png)
-![Website Preview](screenshots/search.png)
-![Website Preview](screenshots/authors.png)
+A comprehensive desktop application for managing a static news website focused on the influencer and creator economy. Features GUI-based content integration, organized file structure, and automated HTML generation with professional styling.
+
+[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
 
 ## ✨ Features
 
-### 🎨 Modern Design
-- **Responsive Design**: Mobile-first approach with Tailwind CSS
-- **Contemporary UI**: Follows 2025 web design trends with gradients, animations, and micro-interactions
-- **Professional Layout**: Clean typography, proper spacing, and visual hierarchy
-- **Dark/Light Elements**: Sophisticated color schemes and contrast
+### 🖥️ **Desktop GUI Application**
+- Visual dashboard with real-time status indicators
+- Progress tracking with detailed logging
+- Selective content integration
+- Content management and removal tools
 
-### 📱 User Experience
-- **Sticky Navigation**: Always-accessible header with search functionality
-- **Live Breaking News Ticker**: Animated news updates
-- **Reading Progress Bar**: Visual indicator for article progress
-- **Social Sharing**: Integrated sharing buttons with floating sidebar
-- **Interactive Comments**: Realistic comment system with engagement features
+### 📝 **Multi-Content Support**
+- **Articles** - News stories with rich formatting
+- **Authors** - Professional profile pages with bios and social links
+- **Categories** - Organized content categorization with color theming
+- **Trending Topics** - Real-time trend analysis with platform metrics
 
-### ⚙️ Automated Content Management
-- **Python Integration Script**: Automatically converts text files to full articles
-- **Dynamic Page Updates**: Homepage and search pages update automatically
-- **Article Database**: JSON-based content management
-- **Author Management**: Pre-configured author profiles with expertise areas
-- **SEO Optimization**: Proper meta tags, structured data, and link management
+### 🌐 **Professional Website Generation**
+- Responsive design with Tailwind CSS
+- Automatic cross-linking between content types
+- SEO-optimized pages with meta tags
+- Mobile-friendly layouts
 
-### 📄 Complete Page System
-- **Homepage**: Featured articles, trending topics, newsletter signup
-- **Search & Browse**: Advanced filtering, real-time search suggestions
-- **Individual Articles**: Full article pages with comments and related content
-- **Authors Page**: Team profiles with social links and article counts
-- **404/Error Pages**: Custom error handling with helpful suggestions
+### 🔄 **Smart Integration System**
+- Database tracking prevents duplicate processing
+- Organized folder structure (`content/` → `integrated/`)
+- Automatic HTML generation and navigation updates
+- Sync utility for database-website alignment
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.7+
-- Web browser
-- Text editor
+- Python 3.7 or higher
+- No additional dependencies (uses built-in tkinter)
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/influencer-news-template.git
-   cd influencer-news-template
+   git clone https://github.com/yourusername/InfNews.git
+   cd InfNews
    ```
 
-2. **Set up the articles directory**
+2. **Launch the application**
    ```bash
-   mkdir articles
+   python3 integration_manager.py
    ```
 
-3. **Create your first article**
-   ```bash
-   cp articles/sample_article.txt articles/my_first_article.txt
-   # Edit the file with your content
-   ```
+3. **Create your first content**
+   - Click "Setup" buttons to create sample files
+   - Edit samples or create new `.txt` files in `content/` directories
+   - Use "Integrate" to process your content
 
-4. **Run the integration script**
-   ```bash
-   python integrate_articles.py
-   ```
+4. **View your website**
+   - Open `index.html` in your browser
+   - Navigate through articles, authors, and categories
 
-5. **Open the website**
-   ```bash
-   # Open index.html in your browser
-   ```
+## 📖 Documentation
 
-## 📝 Creating Articles
+- **[Quick Start Guide](QUICK_START_GUIDE.md)** - Get running in 5 minutes
+- **[Content Format Guide](CONTENT_FORMAT_GUIDE.md)** - Complete formatting reference
+- **[Integration Guide](INTEGRATION_GUIDE.md)** - Advanced usage and features
 
-Articles are created using simple text files with a specific format:
+## 🎯 Content Types
 
+### Articles
 ```
-Title: Your Amazing Article Title
+Title: Breaking: New Creator Fund Announced
 Author: Sarah Chen
 Category: business
-Image: https://images.unsplash.com/photo-example
-Tags: keyword1, keyword2, keyword3
-Excerpt: Brief description for homepage and search results.
+Image: https://images.unsplash.com/photo-123...
+Tags: creator fund, monetization, youtube
+Excerpt: Major platform announces $100M creator fund...
 
 ---
 
-Your article content goes here. You can use markdown-style formatting.
-
-## Section Headings
-
-Regular paragraphs with proper formatting.
-
-### Lists
-- Bullet point one
-- Bullet point two
-- Bullet point three
-
-### Quotes
-> This is a blockquote with proper attribution. - Quote Author
-
-### Information Boxes
-[INFO] This creates a highlighted information box for important details.
+Your article content in markdown format...
 ```
-
-See [Article Format Guide](docs/article_format_guide.md) for complete documentation.
-
-## 🗂️ Project Structure
-
-```
-influencer-news-template/
-├── 📄 index.html              # Homepage
-├── 🔍 search.html             # Search & browse page
-├── 📰 article.html            # Article template
-├── 👥 authors.html            # Editorial team page
-├── ❌ 404.html                # Error page
-├── 🐍 integrate_articles.py   # Main automation script
-├── 🔗 link_verification.py    # Link checking utility
-├── 📊 articles_db.json        # Article database
-├── 📁 articles/               # Article text files
-│   └── sample_article.txt
-├── 📚 docs/                   # Documentation
-│   ├── article_format_guide.md
-│   └── SITEMAP.md
-└── 🖼️ screenshots/           # Demo images
-```
-
-## 🛠️ Available Scripts
-
-### `integrate_articles.py`
-Main script that processes articles and updates the website:
-- Converts text files to HTML articles
-- Updates homepage with latest content
-- Refreshes search index
-- Generates realistic metrics
-- Creates proper navigation links
-
-### `link_verification.py`
-Utility script for maintaining website health:
-- Checks for broken links
-- Fixes navigation issues
-- Updates cross-references
-- Generates sitemap
-
-## 🎨 Customization
-
-### Colors & Branding
-Edit the CSS custom properties in the HTML files to match your brand:
-- Primary colors: Indigo/Purple gradient theme
-- Secondary colors: Category-specific color coding
-- Typography: Inter + Playfair Display font combination
 
 ### Authors
-Add or modify authors in `integrate_articles.py`:
-```python
-self.authors = {
-    'your name': {
-        'name': 'Your Name',
-        'title': 'Your Title',
-        'image': 'your-image-url',
-        'bio': 'Your bio here',
-        'expertise': ['Skill 1', 'Skill 2']
-    }
-}
+```
+Name: Sarah Chen
+Title: Senior Business Reporter
+Bio: Expert in creator economy and digital business
+Image: https://images.unsplash.com/photo-456...
+Location: Los Angeles, CA
+Expertise: Business, Creator Economy, Market Analysis
 ```
 
 ### Categories
-Supported categories with color themes:
-- `business` (green)
-- `entertainment` (orange)
-- `tech` (blue)
-- `fashion` (pink)
-- `charity` (purple)
+```
+Name: Creator Economy
+Slug: creator-economy
+Icon: 💰
+Color: green
+Description: Business of content creation and monetization
+```
 
-## 📱 Responsive Design
+### Trending Topics
+```
+Topic: AI Content Creation Revolution
+Hashtag: #AIContent
+Category: tech
+Trend_Score: 8500
+Status: active
+Youtube_Mentions: 45000
+TikTok_Mentions: 38000
+```
 
-The template is built mobile-first and includes:
-- **Breakpoints**: Tailwind CSS responsive utilities
-- **Navigation**: Collapsible mobile menu
-- **Images**: Responsive with proper aspect ratios
-- **Typography**: Scalable font sizes
-- **Touch Interactions**: Mobile-optimized buttons and links
+## 🏗️ Project Structure
 
-## 🌐 Browser Support
+```
+InfNews/
+├── content/                    # Source content files (.txt)
+│   ├── articles/              # Article source files
+│   ├── authors/               # Author profile files
+│   ├── categories/            # Category definition files
+│   └── trending/              # Trending topic files
+├── integrated/                # Generated HTML content
+│   ├── articles/              # Individual article pages
+│   ├── authors/               # Author profile pages
+│   ├── categories/            # Category pages + listing
+│   └── trending/              # Trending pages + listing
+├── data/                      # JSON databases
+├── src/integrators/           # Core integration logic
+├── integration_manager.py     # Main GUI application
+├── sync_site.py              # Site synchronization utility
+└── *.html                    # Main website pages
+```
 
-- ✅ Chrome 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+
-- ✅ Edge 90+
-- ✅ Mobile browsers (iOS Safari, Chrome Mobile)
+## 🖼️ Screenshots
 
-## 📈 Performance Features
+### Integration Manager Dashboard
+![Dashboard](screenshots/integration-manager.png)
 
-- **Optimized Images**: Proper sizing and compression
-- **Minimal JavaScript**: Vanilla JS for core functionality
-- **CSS Framework**: Tailwind CSS for minimal bundle size
-- **Semantic HTML**: Proper document structure
-- **SEO Ready**: Meta tags, structured data, sitemap
+### Generated Article Page
+![Article](screenshots/article-page.png)
+
+### Categories Overview
+![Categories](screenshots/categories.png)
+
+### Authors Listing
+![Authors](screenshots/authors.png)
+
+## 🛠️ Advanced Usage
+
+### Command Line Tools
+```bash
+# Sync website with database state
+python3 sync_site.py
+
+# Check content status
+python3 sync_site.py status
+```
+
+### Selective Integration
+- Use the "Selective Integration" tab in the GUI
+- Choose specific files to process
+- Ideal for large content batches
+
+### Content Management
+- Browse all integrated content
+- Remove content by ID or filename
+- Clean orphaned files
+- Bulk content operations
+
+## 🔧 Development
+
+### Adding New Content Types
+1. Create integrator class extending `BaseIntegrator`
+2. Implement required abstract methods
+3. Add to integration manager GUI
+4. Update documentation
+
+### Customization
+- **Colors**: Modify category color schemes in integrators
+- **Templates**: Edit HTML generation methods
+- **Styling**: Update Tailwind CSS classes
+- **Layout**: Customize page structures
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit issues and enhancement requests.
+1. **Fork the repository**
+2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
+3. **Commit your changes** (`git commit -m 'Add amazing feature'`)
+4. **Push to branch** (`git push origin feature/amazing-feature`)
+5. **Open a Pull Request**
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📋 TODO / Roadmap
-
-- [ ] Add dark mode toggle
-- [ ] Implement PWA capabilities
-- [ ] Add real-time search
-- [ ] Create admin dashboard
-- [ ] Add newsletter integration
-- [ ] Implement comment system backend
-- [ ] Add analytics dashboard
-- [ ] Create mobile app version
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and development process.
 
 ## 📄 License
 
@@ -226,26 +199,27 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Design Inspiration**: Modern news websites like The Verge, TechCrunch, and Fast Company
-- **Images**: Unsplash for high-quality stock photography
-- **Icons**: Heroicons for beautiful SVG icons
-- **Fonts**: Google Fonts for typography
-- **CSS Framework**: Tailwind CSS for rapid styling
+- **Tailwind CSS** for responsive styling
+- **Unsplash** for high-quality placeholder images
+- **Python tkinter** for cross-platform GUI support
+- **Creator economy community** for inspiration and feedback
+
+## 📊 Stats
+
+- **4 Content Types** supported
+- **Professional HTML** generation
+- **Cross-platform** compatibility
+- **Zero external dependencies**
+- **Database-driven** content management
 
 ## 📞 Support
 
-If you have questions or need help with the template:
-
-- 📖 Check the [Documentation](docs/)
-- 🐛 [Open an Issue](../../issues)
-- 💬 [Start a Discussion](../../discussions)
-
-## 🌟 Show Your Support
-
-If this template helped you, please give it a ⭐ on GitHub!
+- **Issues**: [GitHub Issues](https://github.com/yourusername/InfNews/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/InfNews/discussions)
+- **Documentation**: Available in the `docs/` directory
 
 ---
 
-**Made with ❤️ for the developer community**
+**Built with ❤️ for the creator economy community**
 
-*This template demonstrates modern web development practices and can serve as a starting point for news websites, blogs, or content management systems.*
+[🌟 Star this project](https://github.com/yourusername/InfNews) if you find it useful!

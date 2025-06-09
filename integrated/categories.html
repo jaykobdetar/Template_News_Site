@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Categories - Influencer News</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hero-title { font-family: 'Playfair Display', serif; }
+        .category-card {
+            transition: all 0.3s ease;
+        }
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-indigo-900 text-white sticky top-0 z-50 shadow-2xl">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-indigo-400 to-purple-600 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-2xl font-bold text-white">IN</span>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold hero-title">Influencer News</h1>
+                    <p class="text-xs text-indigo-200">Breaking stories • Real insights</p>
+                </div>
+            </div>
+            <nav class="hidden md:block">
+                <ul class="flex space-x-8">
+                    <li><a href="../index.html" class="hover:text-indigo-200 transition font-medium">Home</a></li>
+                    <li><a href="../search.html" class="hover:text-indigo-200 transition font-medium">Search</a></li>
+                    <li><a href="../authors.html" class="hover:text-indigo-200 transition font-medium">Authors</a></li>
+                    <li><a href="categories.html" class="hover:text-indigo-200 transition font-medium text-indigo-200">Categories</a></li>
+                    <li><a href="trending.html" class="hover:text-indigo-200 transition font-medium">Trending</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-indigo-900 via-purple-800 to-indigo-700 text-white py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-5xl font-bold mb-4 hero-title">Browse Categories</h1>
+            <p class="text-xl text-indigo-200 max-w-3xl mx-auto">
+                Explore our diverse range of content categories covering everything in the influencer world
+            </p>
+        </div>
+    </section>
+
+    <!-- Categories Grid -->
+    <main class="container mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+            <a href="categories/category_creator-economy.html" class="category-card block">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden h-full">
+                    <div class="p-8 text-center" style="background: linear-gradient(135deg, #10b98120 0%, #10b98110 100%);">
+                        <div class="text-6xl mb-4">💰</div>
+                        <h3 class="text-xl font-bold mb-2">Creator Economy</h3>
+                        <p class="text-gray-600 text-sm mb-4">Business of content creation and monetization strategies</p>
+                        <span class="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">
+                            0 Articles
+                        </span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="categories/category_tech.html" class="category-card block">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden h-full">
+                    <div class="p-8 text-center" style="background: linear-gradient(135deg, #3b82f620 0%, #3b82f610 100%);">
+                        <div class="text-6xl mb-4">🚀</div>
+                        <h3 class="text-xl font-bold mb-2">Technology</h3>
+                        <p class="text-gray-600 text-sm mb-4">Platform updates, AI tools, and tech innovations for creators</p>
+                        <span class="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">
+                            0 Articles
+                        </span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="categories/category_business.html" class="category-card block">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden h-full">
+                    <div class="p-8 text-center" style="background: linear-gradient(135deg, #10b98120 0%, #10b98110 100%);">
+                        <div class="text-6xl mb-4">💼</div>
+                        <h3 class="text-xl font-bold mb-2">Business</h3>
+                        <p class="text-gray-600 text-sm mb-4">Creator economy, monetization, and business strategies</p>
+                        <span class="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">
+                            0 Articles
+                        </span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="categories/category_entertainment.html" class="category-card block">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden h-full">
+                    <div class="p-8 text-center" style="background: linear-gradient(135deg, #f59e0b20 0%, #f59e0b10 100%);">
+                        <div class="text-6xl mb-4">🎬</div>
+                        <h3 class="text-xl font-bold mb-2">Entertainment</h3>
+                        <p class="text-gray-600 text-sm mb-4">Celebrity news, drama, and exclusive interviews from the influencer world</p>
+                        <span class="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">
+                            0 Articles
+                        </span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="categories/category_fashion.html" class="category-card block">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden h-full">
+                    <div class="p-8 text-center" style="background: linear-gradient(135deg, #ec489920 0%, #ec489910 100%);">
+                        <div class="text-6xl mb-4">💄</div>
+                        <h3 class="text-xl font-bold mb-2">Fashion &amp; Beauty</h3>
+                        <p class="text-gray-600 text-sm mb-4">Fashion trends, beauty collaborations, and style content</p>
+                        <span class="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">
+                            0 Articles
+                        </span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="categories/category_technology.html" class="category-card block">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden h-full">
+                    <div class="p-8 text-center" style="background: linear-gradient(135deg, #3b82f620 0%, #3b82f610 100%);">
+                        <div class="text-6xl mb-4">🚀</div>
+                        <h3 class="text-xl font-bold mb-2">Technology</h3>
+                        <p class="text-gray-600 text-sm mb-4">Platform updates, AI tools, and tech innovations for creators</p>
+                        <span class="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">
+                            0 Articles
+                        </span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="categories/category_charity.html" class="category-card block">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden h-full">
+                    <div class="p-8 text-center" style="background: linear-gradient(135deg, #8b5cf620 0%, #8b5cf610 100%);">
+                        <div class="text-6xl mb-4">❤️</div>
+                        <h3 class="text-xl font-bold mb-2">Charity &amp; Social Impact</h3>
+                        <p class="text-gray-600 text-sm mb-4">Creator charity work and social impact initiatives</p>
+                        <span class="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">
+                            0 Articles
+                        </span>
+                    </div>
+                </div>
+            </a>
+            
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-12 mt-20">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2024 Influencer News. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,46 +1,24 @@
 #!/usr/bin/env python3
 """
-Influencer News - Article Integration Script
-============================================
-
-This script automatically integrates new articles into your website by:
-1. Reading formatted text files from the 'articles/' directory
-2. Updating all HTML pages with new content
-3. Maintaining proper links and article IDs
-4. Creating individual article pages
-
-Usage: python integrate_articles.py
+Enhanced Article Integrator
+===========================
+Integrates articles with progress callbacks for GUI
 """
 
-import os
-import re
-import json
+import random
 import datetime
 from pathlib import Path
 from typing import Dict, List, Any
-import html
+from .base_integrator import BaseIntegrator
 
-class ArticleIntegrator:
+
+class ArticleIntegrator(BaseIntegrator):
+    """Enhanced article integrator with GUI support"""
+    
     def __init__(self):
-        self.articles_dir = Path("articles")
-        self.articles_dir.mkdir(exist_ok=True)
+        super().__init__('articles', 'articles', 'articles_db.json')
         
-        # Load existing articles database
-        self.db_file = Path("articles_db.json")
-        self.articles_db = self.load_articles_db()
-        
-        # Category mappings for styling
-        self.category_colors = {
-            'business': 'green',
-            'entertainment': 'orange', 
-            'tech': 'blue',
-            'fashion': 'pink',
-            'charity': 'purple',
-            'beauty': 'pink',
-            'technology': 'blue'
-        }
-        
-        # Author database
+        # Author database (would be loaded from author integrator in production)
         self.authors = {
             'sarah chen': {
                 'name': 'Sarah Chen',
@@ -78,21 +56,9 @@ class ArticleIntegrator:
                 'expertise': ['Market Analysis', 'Economics', 'Data Science']
             }
         }
-
-    def load_articles_db(self) -> Dict:
-        """Load existing articles database"""
-        if self.db_file.exists():
-            with open(self.db_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        return {'articles': [], 'next_id': 1}
-
-    def save_articles_db(self):
-        """Save articles database"""
-        with open(self.db_file, 'w', encoding='utf-8') as f:
-            json.dump(self.articles_db, f, indent=2, ensure_ascii=False)
-
-    def parse_article_file(self, file_path: Path) -> Dict[str, Any]:
-        """Parse a formatted article text file"""
+    
+    def parse_content_file(self, file_path: Path) -> Dict[str, Any]:
+        """Parse an article file"""
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read().strip()
         
@@ -102,39 +68,15 @@ class ArticleIntegrator:
             raise ValueError(f"Invalid format in {file_path}. Missing '---' separator.")
         
         # Parse metadata
-        metadata_section = sections[0].strip()
+        metadata = self.parse_metadata_section(sections[0])
         article_content = '\n---\n'.join(sections[1:]).strip()
-        
-        metadata = {}
-        for line in metadata_section.split('\n'):
-            if ':' in line:
-                key, value = line.split(':', 1)
-                metadata[key.strip().lower()] = value.strip()
         
         # Validate required fields
         required_fields = ['title', 'author', 'category', 'image', 'excerpt']
-        for field in required_fields:
-            if field not in metadata:
-                raise ValueError(f"Missing required field '{field}' in {file_path}")
+        self.validate_required_fields(metadata, required_fields, file_path)
         
         # Process content sections
-        content_sections = article_content.split('\n## ')
-        processed_content = []
-        
-        for i, section in enumerate(content_sections):
-            if i == 0:
-                # First section might not have ## prefix
-                if section.startswith('## '):
-                    section = section[3:]
-                processed_content.append(self.format_content_section('', section))
-            else:
-                lines = section.split('\n', 1)
-                heading = lines[0].strip()
-                body = lines[1].strip() if len(lines) > 1 else ''
-                processed_content.append(self.format_content_section(heading, body))
-        
-        # Generate article data
-        article_id = self.articles_db['next_id']
+        processed_content = self.format_article_content(article_content)
         
         # Get author info
         author_key = metadata['author'].lower()
@@ -147,7 +89,6 @@ class ArticleIntegrator:
         })
         
         return {
-            'id': article_id,
             'title': metadata['title'],
             'author': author_info['name'],
             'author_info': author_info,
@@ -155,19 +96,39 @@ class ArticleIntegrator:
             'tags': [tag.strip() for tag in metadata.get('tags', '').split(',') if tag.strip()],
             'image': metadata['image'],
             'excerpt': metadata['excerpt'],
-            'content': '\n'.join(processed_content),
-            'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'content': processed_content,
+            'date': datetime.datetime.now().isoformat(),
             'views': str(self.generate_realistic_views()),
             'comments': str(self.generate_realistic_comments()),
-            'read_time': self.calculate_read_time(article_content)
+            'read_time': self.calculate_read_time(article_content),
+            'trending': metadata.get('trending', 'false').lower() == 'true'
         }
-
+    
+    def format_article_content(self, content: str) -> str:
+        """Format article content with HTML"""
+        html_content = ""
+        
+        # Process content sections
+        content_sections = content.split('\n## ')
+        
+        for i, section in enumerate(content_sections):
+            if i == 0 and not section.startswith('## '):
+                # First section without heading
+                html_content += self.format_content_section('', section)
+            else:
+                lines = section.split('\n', 1)
+                heading = lines[0].strip()
+                body = lines[1].strip() if len(lines) > 1 else ''
+                html_content += self.format_content_section(heading, body)
+        
+        return html_content
+    
     def format_content_section(self, heading: str, content: str) -> str:
         """Format a content section with proper HTML"""
         html_content = ""
         
         if heading:
-            html_content += f'<h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">{html.escape(heading)}</h2>\n'
+            html_content += f'<h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">{self.escape_html(heading)}</h2>\n'
         
         # Process paragraphs and special formatting
         paragraphs = content.split('\n\n')
@@ -183,17 +144,17 @@ class ArticleIntegrator:
                 if ' - ' in quote_text:
                     quote, author = quote_text.rsplit(' - ', 1)
                     html_content += f'''<blockquote class="border-l-4 border-gray-300 pl-6 italic text-gray-700 my-8 text-lg">
-                        {html.escape(quote)}
-                        <footer class="text-sm text-gray-500 mt-2">— {html.escape(author)}</footer>
+                        {self.escape_html(quote)}
+                        <footer class="text-sm text-gray-500 mt-2">— {self.escape_html(author)}</footer>
                     </blockquote>\n'''
                 else:
-                    html_content += f'<blockquote class="border-l-4 border-gray-300 pl-6 italic text-gray-700 my-8 text-lg">{html.escape(quote_text)}</blockquote>\n'
+                    html_content += f'<blockquote class="border-l-4 border-gray-300 pl-6 italic text-gray-700 my-8 text-lg">{self.escape_html(quote_text)}</blockquote>\n'
             elif para.startswith('- '):
                 # Bullet list
                 items = [line[2:].strip() for line in para.split('\n') if line.strip().startswith('- ')]
                 html_content += '<ul class="list-disc pl-6 text-gray-700 mb-6 space-y-2">\n'
                 for item in items:
-                    html_content += f'    <li>{html.escape(item)}</li>\n'
+                    html_content += f'    <li>{self.escape_html(item)}</li>\n'
                 html_content += '</ul>\n'
             elif para.startswith('[INFO]'):
                 # Info box
@@ -206,37 +167,40 @@ class ArticleIntegrator:
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm text-indigo-700">{html.escape(info_text)}</p>
+                            <p class="text-sm text-indigo-700">{self.escape_html(info_text)}</p>
                         </div>
                     </div>
                 </div>\n'''
             else:
                 # Regular paragraph
-                html_content += f'<p class="text-gray-700 mb-6">{html.escape(para)}</p>\n'
+                html_content += f'<p class="text-gray-700 mb-6">{self.escape_html(para)}</p>\n'
         
         return html_content
-
+    
     def generate_realistic_views(self) -> int:
         """Generate realistic view count"""
-        import random
         return random.randint(50000, 2000000)
-
+    
     def generate_realistic_comments(self) -> int:
         """Generate realistic comment count"""
-        import random
         return random.randint(100, 5000)
-
+    
     def calculate_read_time(self, content: str) -> str:
         """Calculate estimated read time"""
         word_count = len(content.split())
         minutes = max(1, round(word_count / 200))  # Average 200 WPM
         return f"{minutes} min"
-
-    def create_article_page(self, article: Dict[str, Any]):
+    
+    def create_content_page(self, article: Dict[str, Any]):
         """Create individual article page"""
         # Read the article template
         with open('article.html', 'r', encoding='utf-8') as f:
             template = f.read()
+        
+        # Format numbers with commas
+        views_formatted = f"{int(article['views']):,}"
+        likes_formatted = f"{int(article['views']) // 50:,}"
+        comments_formatted = f"{int(article['comments']):,}"
         
         # Replace placeholders
         replacements = {
@@ -248,13 +212,28 @@ class ArticleIntegrator:
             'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=400&fit=crop': article['image'],
             'Published 2 hours ago': f"Published {self.format_date_relative(article['date'])}",
             '5 minute read': f"{article['read_time']} read",
-            '1,247,892': article['views'],
-            '24,156': str(int(article['views'].replace(',', '')) // 50),  # Likes = views / 50
-            '2,847': article['comments'],
+            '1,247,892': views_formatted,
+            '24,156': likes_formatted,
+            '2,847': comments_formatted,
         }
         
         # Apply replacements
         for old, new in replacements.items():
+            template = template.replace(old, new)
+        
+        # Fix navigation links for subfolder structure (articles are in integrated/articles/)
+        navigation_fixes = {
+            'href="index.html"': 'href="../../index.html"',
+            'href="search.html"': 'href="../../search.html"',
+            'href="authors.html"': 'href="../../authors.html"',
+            'href="integrated/categories.html"': 'href="../categories.html"',
+            'href="integrated/trending.html"': 'href="../trending.html"',
+            'href="search.html?category=business"': 'href="../../search.html?category=business"',
+            'href="search.html?q=business"': 'href="../../search.html?q=business"',
+            "window.location.href = `search.html?q=": "window.location.href = `../../search.html?q="
+        }
+        
+        for old, new in navigation_fixes.items():
             template = template.replace(old, new)
         
         # Replace content
@@ -264,19 +243,24 @@ class ArticleIntegrator:
         if content_start != -1 and content_end != -1:
             new_content = f'''<div class="prose prose-lg max-w-none" id="articleContent">
                 <p class="text-xl text-gray-700 font-medium mb-6 leading-relaxed">
-                    {html.escape(article['excerpt'])}
+                    {self.escape_html(article['excerpt'])}
                 </p>
                 {article['content']}
             </div>'''
             template = template[:content_start] + new_content + template[content_end:]
         
         # Save the article page
-        article_filename = f"article_{article['id']}.html"
+        article_filename = self.integrated_dir / f"article_{article['id']}.html"
         with open(article_filename, 'w', encoding='utf-8') as f:
             f.write(template)
         
-        print(f"✅ Created article page: {article_filename}")
-
+        self.update_progress(f"Created article page: {article_filename}")
+    
+    def update_listing_page(self, articles: List[Dict[str, Any]]):
+        """Update homepage with latest articles"""
+        self.update_homepage(articles)
+        self.update_search_page(articles)
+    
     def update_homepage(self, articles: List[Dict[str, Any]]):
         """Update homepage with latest articles"""
         with open('index.html', 'r', encoding='utf-8') as f:
@@ -284,13 +268,19 @@ class ArticleIntegrator:
         
         # Generate article cards HTML
         articles_html = ""
-        for i, article in enumerate(articles[:6]):  # Show latest 6 articles
-            card_class = "md:col-span-2 lg:col-span-1" if i == 0 else ""  # Featured article
-            
-            articles_html += f'''
+        
+        if articles:
+            # If there are articles, display them
+            for i, article in enumerate(articles[:6]):  # Show latest 6 articles
+                card_class = "md:col-span-2 lg:col-span-1" if i == 0 else ""  # Featured article
+                
+                # Format views
+                views_formatted = f"{int(article['views']):,}" if article['views'].isdigit() else article['views']
+                
+                articles_html += f'''
                 <div class="article-card bg-white rounded-xl shadow-lg overflow-hidden {card_class}">
                     <div class="relative">
-                        <img src="{article['image']}" alt="{html.escape(article['title'])}" class="w-full h-48 object-cover">
+                        <img src="{article['image']}" alt="{self.escape_html(article['title'])}" class="w-full h-48 object-cover">
                         <div class="absolute top-4 right-4">
                             <span class="category-{article['category']} bg-white/90 px-2 py-1 rounded text-xs font-bold uppercase">{article['category']}</span>
                         </div>
@@ -300,16 +290,25 @@ class ArticleIntegrator:
                             <span class="text-gray-500 text-sm">{article['author']} • {self.format_date_relative(article['date'])}</span>
                         </div>
                         <h3 class="text-lg font-bold mb-3 hover:text-indigo-600 transition cursor-pointer">
-                            {html.escape(article['title'])}
+                            {self.escape_html(article['title'])}
                         </h3>
                         <p class="text-gray-700 mb-4 text-sm">
-                            {html.escape(article['excerpt'])}
+                            {self.escape_html(article['excerpt'])}
                         </p>
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-gray-500">👁 {article['views']} views</span>
-                            <a href="article_{article['id']}.html" class="text-indigo-600 font-medium cursor-pointer">Read →</a>
+                            <span class="text-gray-500">👁 {views_formatted} views</span>
+                            <a href="integrated/articles/article_{article['id']}.html" class="text-indigo-600 font-medium cursor-pointer">Read →</a>
                         </div>
                     </div>
+                </div>
+            '''
+        else:
+            # If no articles, show empty state
+            articles_html = '''
+                <div class="col-span-full text-center py-16">
+                    <div class="text-gray-400 text-6xl mb-4">📰</div>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">No Articles Yet</h3>
+                    <p class="text-gray-500">Check back soon for the latest news and updates!</p>
                 </div>
             '''
         
@@ -327,34 +326,37 @@ class ArticleIntegrator:
         with open('index.html', 'w', encoding='utf-8') as f:
             f.write(content)
         
-        print("✅ Updated homepage with latest articles")
-
+        if articles:
+            self.update_progress(f"Updated homepage with {len(articles)} articles")
+        else:
+            self.update_progress("Cleared homepage - no articles to display")
+    
     def update_search_page(self, articles: List[Dict[str, Any]]):
         """Update search page JavaScript with new articles"""
         with open('search.html', 'r', encoding='utf-8') as f:
             content = f.read()
         
         # Generate JavaScript articles array
-        js_articles = "const articles = [\n"
-        for article in articles:
-            # Escape quotes properly for JavaScript
-            title_escaped = html.escape(article['title']).replace('"', '\\"')
-            excerpt_escaped = html.escape(article['excerpt']).replace('"', '\\"')
-            
-            js_articles += f'''            {{
+        if articles:
+            js_articles = "const articles = [\n"
+            for article in articles:
+                js_articles += f'''            {{
                 id: {article['id']},
-                title: "{title_escaped}",
-                author: "{article['author']}",
+                title: "{self.escape_js_string(article['title'])}",
+                author: "{self.escape_js_string(article['author'])}",
                 date: "{self.format_date_relative(article['date'])}",
                 category: "{article['category']}",
                 views: "{article['views']}",
                 image: "{article['image']}",
-                excerpt: "{excerpt_escaped}",
+                excerpt: "{self.escape_js_string(article['excerpt'])}",
                 readTime: "{article['read_time']}",
                 trending: {str(article.get('trending', False)).lower()}
             }},
 '''
-        js_articles += "        ];"
+            js_articles += "        ];"
+        else:
+            # Empty articles array when no articles
+            js_articles = "const articles = [];"
         
         # Replace articles array in JavaScript
         start_marker = "const articles = ["
@@ -368,79 +370,13 @@ class ArticleIntegrator:
         with open('search.html', 'w', encoding='utf-8') as f:
             f.write(content)
         
-        print("✅ Updated search page with new articles")
-
-    def format_date_relative(self, date_str: str) -> str:
-        """Format date as relative time"""
-        try:
-            date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
-            now = datetime.datetime.now()
-            diff = now - date_obj
-            
-            if diff.days > 0:
-                return f"{diff.days} day{'s' if diff.days > 1 else ''} ago"
-            elif diff.seconds > 3600:
-                hours = diff.seconds // 3600
-                return f"{hours} hour{'s' if hours > 1 else ''} ago"
-            else:
-                minutes = max(1, diff.seconds // 60)
-                return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
-        except:
-            return "Recently"
-
-    def process_new_articles(self):
-        """Process all new article files"""
-        processed_count = 0
-        
-        # Get list of existing article files
-        existing_files = {article.get('filename', '') for article in self.articles_db['articles']}
-        
-        # Process each .txt file in articles directory
-        for file_path in self.articles_dir.glob("*.txt"):
-            if file_path.name in existing_files:
-                print(f"⏭️  Skipping already processed: {file_path.name}")
-                continue
-            
-            try:
-                print(f"🔄 Processing: {file_path.name}")
-                article = self.parse_article_file(file_path)
-                article['filename'] = file_path.name
-                
-                # Add to database
-                self.articles_db['articles'].append(article)
-                self.articles_db['next_id'] += 1
-                
-                # Create individual article page
-                self.create_article_page(article)
-                
-                processed_count += 1
-                print(f"✅ Successfully processed: {article['title']}")
-                
-            except Exception as e:
-                print(f"❌ Error processing {file_path.name}: {str(e)}")
-                continue
-        
-        if processed_count > 0:
-            # Sort articles by date (newest first)
-            self.articles_db['articles'].sort(
-                key=lambda x: x['date'], 
-                reverse=True
-            )
-            
-            # Update website pages
-            self.update_homepage(self.articles_db['articles'])
-            self.update_search_page(self.articles_db['articles'])
-            
-            # Save database
-            self.save_articles_db()
-            
-            print(f"\n🎉 Successfully integrated {processed_count} new article(s)!")
-            print(f"📊 Total articles in database: {len(self.articles_db['articles'])}")
+        if articles:
+            self.update_progress(f"Updated search page with {len(articles)} articles")
         else:
-            print("\n📝 No new articles to process.")
-
-    def create_sample_article(self):
-        """Create a sample article file for reference"""
+            self.update_progress("Cleared search page - no articles to display")
+    
+    def create_sample_file(self):
+        """Create a sample article file"""
         sample_content = """Title: Sample Article Title Here
 Author: Sarah Chen
 Category: business
@@ -481,33 +417,12 @@ You can include blockquotes like this:
 End your article with a strong conclusion that ties everything together and provides value to the reader.
 """
         
-        sample_file = self.articles_dir / "sample_article.txt"
+        sample_file = self.content_dir / "sample_article.txt"
         with open(sample_file, 'w', encoding='utf-8') as f:
             f.write(sample_content)
         
-        print(f"📝 Created sample article: {sample_file}")
-        print("📖 Edit this file and run the script again to see it integrated!")
+        self.update_progress(f"Created sample article: {sample_file}")
 
-def main():
-    """Main function"""
-    print("🚀 Influencer News - Article Integration Script")
-    print("=" * 50)
-    
-    integrator = ArticleIntegrator()
-    
-    # Check if articles directory is empty
-    txt_files = list(integrator.articles_dir.glob("*.txt"))
-    if not txt_files:
-        print("📁 No article files found. Creating sample article...")
-        integrator.create_sample_article()
-        return
-    
-    # Process articles
-    integrator.process_new_articles()
-    
-    print("\n🔗 Article Links:")
-    for article in integrator.articles_db['articles'][:5]:  # Show latest 5
-        print(f"   • article_{article['id']}.html - {article['title']}")
 
-if __name__ == "__main__":
-    main()
+# Import datetime at the top of the file
+import datetime
