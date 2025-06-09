@@ -4,7 +4,7 @@ A beautifully designed, fully responsive news website template with automated co
 
 > **⚠️ Disclaimer**: This is a demonstration project and template, not a real news website. All content and articles are fictional examples for showcase purposes.
 
-![Website Preview](screenshots/homepage-preview.png)
+![Website Preview](screenshots/home.png)
 
 ## ✨ Features
 
