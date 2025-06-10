@@ -10,13 +10,16 @@ import datetime
 from pathlib import Path
 from typing import Dict, List, Any
 from .base_integrator import BaseIntegrator
+from ..models.article import Article
+from ..models.author import Author
+from ..models.category import Category
 
 
 class ArticleIntegrator(BaseIntegrator):
     """Enhanced article integrator with GUI support"""
     
     def __init__(self):
-        super().__init__('articles', 'articles', 'articles_db.json')
+        super().__init__('articles', 'articles')
         
         # Author database (would be loaded from author integrator in production)
         self.authors = {
@@ -56,6 +59,66 @@ class ArticleIntegrator(BaseIntegrator):
                 'expertise': ['Market Analysis', 'Economics', 'Data Science']
             }
         }
+    
+    def sync_all(self):
+        """Sync all articles from database"""
+        self.update_progress("Starting article sync...")
+        
+        try:
+            # Get articles from database with pagination (default limit)
+            articles = Article.find_all(limit=50)  # Reasonable default limit
+            
+            if not articles:
+                self.update_progress("No articles found in database")
+                return
+                
+            # Convert to dictionaries for compatibility
+            article_dicts = []
+            for article in articles:
+                # Get author info from the integrator's author database
+                author_name = article.author_name or 'Unknown Author'
+                author_key = author_name.lower()
+                author_info = self.authors.get(author_key, {
+                    'name': author_name,
+                    'title': 'Contributor',
+                    'image': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
+                    'bio': 'Contributing writer for Influencer News.',
+                    'expertise': ['General']
+                })
+                
+                article_dict = {
+                    'id': article.id,
+                    'title': article.title,
+                    'slug': article.slug,
+                    'author': author_name,
+                    'author_info': author_info,
+                    'author_slug': article.author_slug or '',
+                    'category': article.category_name or 'Uncategorized',
+                    'category_slug': article.category_slug or '',
+                    'date': article.publication_date,
+                    'content': article.content,
+                    'excerpt': article.subtitle or '',
+                    'image': f'assets/images/articles/article_{article.id}_hero.jpg',
+                    'views': str(article.view_count),
+                    'comments': '0',  # Default for now
+                    'read_time': f'{article.read_time} min read',
+                    'tags': article.tags if isinstance(article.tags, list) else [],
+                    'trending': False  # Default for now
+                }
+                article_dicts.append(article_dict)
+                
+            # Create individual article pages
+            for article_dict in article_dicts:
+                self.create_content_page(article_dict)
+                
+            # Update listing pages (homepage, search)
+            self.update_listing_page(article_dicts)
+            
+            self.update_progress(f"Synced {len(articles)} articles successfully")
+            
+        except Exception as e:
+            self.update_progress(f"Error syncing articles: {e}")
+            raise
     
     def parse_content_file(self, file_path: Path) -> Dict[str, Any]:
         """Parse an article file"""
@@ -271,11 +334,11 @@ class ArticleIntegrator(BaseIntegrator):
         
         if articles:
             # If there are articles, display them
-            for i, article in enumerate(articles[:6]):  # Show latest 6 articles
+            for i, article in enumerate(articles[:12]):  # Show latest 12 articles for pagination
                 card_class = "md:col-span-2 lg:col-span-1" if i == 0 else ""  # Featured article
                 
                 # Format views
-                views_formatted = f"{int(article['views']):,}" if article['views'].isdigit() else article['views']
+                views_formatted = f"{article['views']:,}" if isinstance(article['views'], int) else str(article['views'])
                 
                 articles_html += f'''
                 <div class="article-card bg-white rounded-xl shadow-lg overflow-hidden {card_class}">
@@ -422,6 +485,132 @@ End your article with a strong conclusion that ties everything together and prov
             f.write(sample_content)
         
         self.update_progress(f"Created sample article: {sample_file}")
+    
+    def process_article(self, content_data: Dict[str, Any]) -> bool:
+        """Process article content and add to database"""
+        try:
+            # Find author by name
+            author_name = content_data.get('author', '').lower()
+            author = Author.find_by_slug(author_name.replace(' ', '-'))
+            if not author:
+                # Try by exact name match
+                all_authors = Author.find_all()
+                author = next((a for a in all_authors if a.name.lower() == author_name), None)
+                
+            if not author:
+                self.update_progress(f"Warning: Author '{content_data.get('author')}' not found, using default")
+                # Use first available author as fallback
+                all_authors = Author.find_all()
+                author = all_authors[0] if all_authors else None
+                if not author:
+                    self.update_progress("Error: No authors found in database")
+                    return False
+            
+            # Find category by name
+            category_name = content_data.get('category', '').lower()
+            category = Category.find_by_slug(category_name)
+            if not category:
+                # Try by exact name match  
+                all_categories = Category.find_all()
+                category = next((c for c in all_categories if c.name.lower() == category_name), None)
+                
+            if not category:
+                self.update_progress(f"Warning: Category '{content_data.get('category')}' not found, using default")
+                # Use first available category as fallback
+                all_categories = Category.find_all()
+                category = all_categories[0] if all_categories else None
+                if not category:
+                    self.update_progress("Error: No categories found in database")
+                    return False
+            
+            # Generate slug from title
+            title = content_data.get('title', '')
+            slug = title.lower().replace(' ', '-').replace(',', '').replace(':', '').replace('?', '').replace('!', '')
+            slug = ''.join(c for c in slug if c.isalnum() or c == '-')
+            
+            # Check if article already exists
+            existing = Article.find_by_slug(slug)
+            if existing:
+                self.update_progress(f"Article '{title}' already exists, skipping")
+                return False
+            
+            # Create article
+            article = Article(
+                title=title,
+                slug=slug,
+                author_id=author.id,
+                category_id=category.id,
+                publication_date=content_data.get('date', datetime.datetime.now().isoformat()),
+                content=content_data.get('content', ''),
+                subtitle=content_data.get('excerpt', ''),
+                read_time=content_data.get('read_time', 5),
+                tags=content_data.get('tags', []),
+                meta_description=content_data.get('excerpt', '')
+            )
+            
+            # Save to database
+            article.save()
+            
+            # Handle image if provided
+            if content_data.get('image'):
+                self.convert_image_urls(
+                    content={'image': content_data['image'], 'title': title},
+                    content_type='article',
+                    content_id=article.id,
+                    slug=slug
+                )
+            
+            self.update_progress(f"Successfully added article: {title}")
+            return True
+            
+        except Exception as e:
+            self.update_progress(f"Error processing article: {str(e)}")
+            return False
+    
+    def update_all_listing_pages(self):
+        """Update all listing pages with current articles from database"""
+        self.update_progress("Updating listing pages...")
+        
+        # Get all articles from database
+        articles = Article.find_all()
+        
+        # Convert to dictionaries for compatibility
+        article_dicts = []
+        for article in articles:
+            author_name = article.author_name or 'Unknown Author'
+            author_key = author_name.lower()
+            author_info = self.authors.get(author_key, {
+                'name': author_name,
+                'title': 'Contributor',
+                'image': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
+                'bio': 'Contributing writer for Influencer News.',
+                'expertise': ['General']
+            })
+            
+            article_dict = {
+                'id': article.id,
+                'title': article.title,
+                'slug': article.slug,
+                'author': author_name,
+                'author_info': author_info,
+                'author_slug': article.author_slug or '',
+                'category': article.category_name or 'Uncategorized',
+                'category_slug': article.category_slug or '',
+                'date': article.publication_date,
+                'content': article.content,
+                'excerpt': article.subtitle or '',
+                'views': random.randint(500, 50000),
+                'read_time': random.randint(2, 8),
+                'image': f'assets/images/articles/article_{article.id}_hero.jpg',
+                'trending': False
+            }
+            article_dicts.append(article_dict)
+        
+        # Update homepage and search page
+        self.update_homepage(article_dicts)
+        self.update_search_page(article_dicts)
+        
+        self.update_progress(f"Updated listing pages with {len(article_dicts)} articles")
 
 
 # Import datetime at the top of the file

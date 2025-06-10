@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Charity & Social Impact - Category | Influencer News</title>
+    <title>Charity & Social Impact - Influencer News</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +11,6 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .hero-title { font-family: 'Playfair Display', serif; }
-        .category-charity { color: #8b5cf6; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -40,65 +39,29 @@
     </header>
 
     <!-- Category Hero -->
-    <section class="bg-gradient-to-br from-purple-700 via-purple-600 to-purple-500 text-white py-20">
-        <div class="container mx-auto px-4 text-center">
-            <div class="text-8xl mb-6">❤️</div>
-            <h1 class="text-5xl font-bold mb-4 hero-title">Charity &amp; Social Impact</h1>
-            <p class="text-xl text-white/90 max-w-3xl mx-auto mb-8">
-                Creator charity work and social impact initiatives
-            </p>
-            <div class="flex gap-4 justify-center">
-                <span class="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full">
-                    📊 0 Articles
-                </span>
-                <span class="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full">
-                    🔥 Trending Category
+    <section class="py-20" style="background: linear-gradient(135deg, #4F46E5, #4F46E599);">
+        <div class="container mx-auto px-4 text-center text-white">
+            <h1 class="text-5xl font-bold mb-4 hero-title">Charity & Social Impact</h1>
+            <p class="text-xl mb-6">Creator charity work and social impact initiatives</p>
+            <div class="text-lg">
+                <span class="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                    0 articles available
                 </span>
             </div>
         </div>
     </section>
 
-    <!-- Main Content -->
+    <!-- Articles Grid -->
     <main class="container mx-auto px-4 py-12">
-        <!-- About This Category -->
-        <div class="bg-white rounded-2xl shadow-lg p-8 mb-12">
-            <h2 class="text-3xl font-bold mb-6 hero-title">About Charity &amp; Social Impact</h2>
-            <div class="prose prose-lg max-w-none text-gray-700">
-                <p class="mb-4">Creator charity work and social impact initiatives</p>
-<p class="mb-4">This category covers all aspects of charity &amp; social impact in the influencer and creator space, providing comprehensive coverage of trends, news, and insights.</p>
-
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <div class="col-span-full text-center py-16">
+                <div class="text-gray-400 text-6xl mb-4">📄</div>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No Articles Yet</h3>
+                <p class="text-gray-500">Check back soon for the latest updates in this category!</p>
             </div>
             
-            
-            <div class="mt-8 pt-8 border-t border-gray-200">
-                <h3 class="text-xl font-bold mb-4">Related Topics</h3>
-                <div class="flex flex-wrap gap-2">
-        <span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">charity</span>
-<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">content creation</span>
-
-                </div>
-            </div>
-        
         </div>
-
-        <!-- Articles in Category -->
-        <section>
-            <h2 class="text-3xl font-bold mb-8 hero-title">Latest in Charity &amp; Social Impact</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="categoryArticles">
-                <!-- Articles will be dynamically loaded here -->
-                <div class="bg-gray-100 rounded-xl p-8 text-center text-gray-500">
-                    <p>Articles in this category will appear here after integration.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Related Categories -->
-        <section class="mt-16">
-            <h2 class="text-3xl font-bold mb-8 hero-title">Explore More Categories</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="relatedCategories">
-                <!-- Related categories will be loaded here -->
-            </div>
-        </section>
     </main>
 
     <!-- Footer -->
@@ -107,13 +70,5 @@
             <p>&copy; 2024 Influencer News. All rights reserved.</p>
         </div>
     </footer>
-
-    <script>
-        // Load articles for this category
-        document.addEventListener('DOMContentLoaded', function() {
-            // This would be populated by the article integrator
-            console.log('Loading articles for category: charity');
-        });
-    </script>
 </body>
 </html>

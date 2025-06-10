@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Technology - Category | Influencer News</title>
+    <title>Technology - Influencer News</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +11,6 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .hero-title { font-family: 'Playfair Display', serif; }
-        .category-technology { color: #3b82f6; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -40,76 +39,47 @@
     </header>
 
     <!-- Category Hero -->
-    <section class="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 text-white py-20">
-        <div class="container mx-auto px-4 text-center">
-            <div class="text-8xl mb-6">🚀</div>
+    <section class="py-20" style="background: linear-gradient(135deg, #4F46E5, #4F46E599);">
+        <div class="container mx-auto px-4 text-center text-white">
             <h1 class="text-5xl font-bold mb-4 hero-title">Technology</h1>
-            <p class="text-xl text-white/90 max-w-3xl mx-auto mb-8">
-                Platform updates, AI tools, and tech innovations for creators
-            </p>
-            <div class="flex gap-4 justify-center">
-                <span class="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full">
-                    📊 0 Articles
-                </span>
-                <span class="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full">
-                    🔥 Trending Category
+            <p class="text-xl mb-6">Latest in tech, AI, and digital innovation</p>
+            <div class="text-lg">
+                <span class="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                    1 articles available
                 </span>
             </div>
         </div>
     </section>
 
-    <!-- Main Content -->
+    <!-- Articles Grid -->
     <main class="container mx-auto px-4 py-12">
-        <!-- About This Category -->
-        <div class="bg-white rounded-2xl shadow-lg p-8 mb-12">
-            <h2 class="text-3xl font-bold mb-6 hero-title">About Technology</h2>
-            <div class="prose prose-lg max-w-none text-gray-700">
-                <p class="mb-4">The Technology category covers the technical innovations and platform changes that impact creators daily. From algorithm updates to new AI tools, we keep you informed about the tech that powers the creator economy.</p>
-<p class="mb-4">Major areas of coverage:</p>
-<p class="mb-4">Platform Updates - Detailed analysis of changes to YouTube, TikTok, Instagram, Twitch, and other platforms. We break down algorithm changes, new features, and policy updates that affect creator success.</p>
-<p class="mb-4">AI and Creator Tools - The latest AI tools for content creation, editing, and audience growth. We review and explain new software that can transform creator workflows.</p>
-<p class="mb-4">Streaming Technology - Updates on streaming platforms, OBS, encoding technologies, and the technical side of live content creation.</p>
-<p class="mb-4">Analytics and Data - Deep dives into creator analytics tools, audience insights platforms, and data-driven strategies for growth.</p>
-<p class="mb-4">Emerging Platforms - Coverage of new platforms and technologies that could become the next big thing for creators.</p>
-<p class="mb-4">Technical Tutorials - How-to guides for creators looking to improve their technical setup, from camera gear to editing software.</p>
-
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             
-            
-            <div class="mt-8 pt-8 border-t border-gray-200">
-                <h3 class="text-xl font-bold mb-4">Related Topics</h3>
-                <div class="flex flex-wrap gap-2">
-        <span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">AI</span>
-<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">platforms</span>
-<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">algorithms</span>
-<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">tools</span>
-<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">software</span>
-<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">streaming</span>
-<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition cursor-pointer">innovation</span>
-
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div class="relative">
+                    <img src="/assets/placeholders/article_placeholder.svg" 
+                         alt="New Platform Update Changes Everything for Creators" 
+                         class="w-full h-48 object-cover">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-gray-500 text-sm">Alex Rivera • Recently</span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-3 hover:text-indigo-600 transition">
+                        <a href="../articles/article_10.html">New Platform Update Changes Everything for Creators</a>
+                    </h3>
+                    <p class="text-gray-700 mb-4 text-sm">
+                        New Platform Update Changes Everything for Creators...
+                    </p>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">👁 0 views</span>
+                        <a href="../articles/article_10.html" 
+                           class="text-indigo-600 font-medium">Read →</a>
+                    </div>
                 </div>
             </div>
-        
+            
         </div>
-
-        <!-- Articles in Category -->
-        <section>
-            <h2 class="text-3xl font-bold mb-8 hero-title">Latest in Technology</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="categoryArticles">
-                <!-- Articles will be dynamically loaded here -->
-                <div class="bg-gray-100 rounded-xl p-8 text-center text-gray-500">
-                    <p>Articles in this category will appear here after integration.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Related Categories -->
-        <section class="mt-16">
-            <h2 class="text-3xl font-bold mb-8 hero-title">Explore More Categories</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="relatedCategories">
-                <!-- Related categories will be loaded here -->
-            </div>
-        </section>
     </main>
 
     <!-- Footer -->
@@ -118,13 +88,5 @@
             <p>&copy; 2024 Influencer News. All rights reserved.</p>
         </div>
     </footer>
-
-    <script>
-        // Load articles for this category
-        document.addEventListener('DOMContentLoaded', function() {
-            // This would be populated by the article integrator
-            console.log('Loading articles for category: technology');
-        });
-    </script>
 </body>
 </html>
