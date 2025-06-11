@@ -1,17 +1,18 @@
-Topic: [Trending Topic Title]
-Hashtag: [#RelatedHashtag]
-Category: [Related category slug: business, entertainment, tech, fashion, etc.]
-Trend_Score: [Number 1-10000, higher = more trending]
-Related_Articles: [Comma-separated article IDs if any]
-Status: [active, rising, steady, declining]
-Icon: [Emoji icon - usually 🔥 for hot trends]
-Growth_Rate: [Percentage growth rate, can be negative]
-Heat_Score: [Number 0-100, trending intensity]
-Youtube_Mentions: [Number of mentions on YouTube]
-TikTok_Mentions: [Number of mentions on TikTok]
-Instagram_Mentions: [Number of mentions on Instagram]
-Twitter_Mentions: [Number of mentions on Twitter]
-Twitch_Mentions: [Number of mentions on Twitch]
+Title: [Trending Topic Title]
+Slug: [url-friendly-slug - auto-generated if not provided]
+Category_ID: [Related category ID number - must exist in categories table]
+Icon: [Emoji icon - usually 🔥 for hot trends - optional]
+Heat_Score: [Number 0-10000, trending intensity - defaults to 0]
+Related_Articles: [Comma-separated article IDs if any - optional]
+Is_Active: [true/false - whether topic is currently active - defaults to true]
+Peak_Date: [YYYY-MM-DD when topic peaked - auto-updated when heat score increases]
+Momentum: [Rate of heat score change - auto-calculated, can be negative]
+
+# Deprecated fields (for reference only, not used by current model):
+# Hashtag: [#RelatedHashtag] - Use for content reference but not stored
+# Status: [active, rising, steady, declining] - Use Is_Active instead  
+# Growth_Rate: [Percentage] - Use Momentum instead
+# Platform mentions (Youtube_Mentions, etc.) - Not supported in current model
 
 ---
 

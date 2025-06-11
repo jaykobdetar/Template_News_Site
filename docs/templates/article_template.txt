@@ -1,11 +1,21 @@
 Title: [Article Title - Should be compelling and descriptive]
+Slug: [url-friendly-slug - auto-generated if not provided]
 Author: [Author name - must match an existing author in the system]
 Category: [Category slug: business, entertainment, tech, fashion, creator-economy, etc.]
+Status: [draft, published, archived - defaults to draft]
+Featured: [true/false - whether to feature prominently on homepage]
+Trending: [true/false - whether this should appear in trending section]
 Image: [Featured image URL for the article]
+Hero_Image: [Large hero image URL - optional, defaults to Image if not provided]
+Thumbnail: [Small thumbnail image URL - optional, auto-generated if not provided]
 Tags: [Comma-separated tags for SEO and categorization]
 Excerpt: [Brief excerpt/summary for homepage and search results - keep under 200 characters]
-Trending: [true/false - whether this should appear in trending section]
-Date: [YYYY-MM-DD format, optional - will default to current date]
+SEO_Title: [SEO optimized title - optional, defaults to Title]
+SEO_Description: [Meta description for search engines - optional]
+Read_Time: [Estimated reading time in minutes - auto-calculated if not provided]
+Publish_Date: [YYYY-MM-DD format or YYYY-MM-DD HH:MM:SS - defaults to current date for published articles]
+Mobile_Title: [Mobile-optimized shorter title - optional]
+Mobile_Excerpt: [Mobile-optimized shorter excerpt - optional]
 
 ---
 

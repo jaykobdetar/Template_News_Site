@@ -7,12 +7,19 @@ Integrates articles with progress callbacks for GUI
 
 import random
 import datetime
+import json
 from pathlib import Path
 from typing import Dict, List, Any
-from .base_integrator import BaseIntegrator
-from ..models.article import Article
-from ..models.author import Author
-from ..models.category import Category
+try:
+    from .base_integrator import BaseIntegrator
+    from ..models.article import Article
+    from ..models.author import Author
+    from ..models.category import Category
+except ImportError:
+    from src.integrators.base_integrator import BaseIntegrator
+    from src.models.article import Article
+    from src.models.author import Author
+    from src.models.category import Category
 
 
 class ArticleIntegrator(BaseIntegrator):
@@ -256,9 +263,16 @@ class ArticleIntegrator(BaseIntegrator):
     
     def create_content_page(self, article: Dict[str, Any]):
         """Create individual article page"""
+        # Get path manager for this location
+        path_manager = self.get_path_manager(f"integrated/articles/article_{article['id']}.html")
+        base_path = path_manager.get_base_path()
+        
         # Read the article template
         with open('article.html', 'r', encoding='utf-8') as f:
             template = f.read()
+        
+        # Replace {base_path} placeholders with actual base path
+        template = template.replace('{base_path}', base_path)
         
         # Format numbers with commas
         views_formatted = f"{int(article['views']):,}"
@@ -282,21 +296,6 @@ class ArticleIntegrator(BaseIntegrator):
         
         # Apply replacements
         for old, new in replacements.items():
-            template = template.replace(old, new)
-        
-        # Fix navigation links for subfolder structure (articles are in integrated/articles/)
-        navigation_fixes = {
-            'href="index.html"': 'href="../../index.html"',
-            'href="search.html"': 'href="../../search.html"',
-            'href="authors.html"': 'href="../../authors.html"',
-            'href="integrated/categories.html"': 'href="../categories.html"',
-            'href="integrated/trending.html"': 'href="../trending.html"',
-            'href="search.html?category=business"': 'href="../../search.html?category=business"',
-            'href="search.html?q=business"': 'href="../../search.html?q=business"',
-            "window.location.href = `search.html?q=": "window.location.href = `../../search.html?q="
-        }
-        
-        for old, new in navigation_fixes.items():
             template = template.replace(old, new)
         
         # Replace content
@@ -540,12 +539,12 @@ End your article with a strong conclusion that ties everything together and prov
                 slug=slug,
                 author_id=author.id,
                 category_id=category.id,
-                publication_date=content_data.get('date', datetime.datetime.now().isoformat()),
+                publish_date=content_data.get('date', datetime.datetime.now().isoformat()),
                 content=content_data.get('content', ''),
-                subtitle=content_data.get('excerpt', ''),
-                read_time=content_data.get('read_time', 5),
-                tags=content_data.get('tags', []),
-                meta_description=content_data.get('excerpt', '')
+                excerpt=content_data.get('excerpt', ''),
+                read_time_minutes=content_data.get('read_time', 5),
+                tags_json=json.dumps(content_data.get('tags', [])),
+                seo_description=content_data.get('excerpt', '')
             )
             
             # Save to database

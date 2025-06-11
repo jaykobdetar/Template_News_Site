@@ -7,8 +7,12 @@ Handles trending topics integration with database
 
 from pathlib import Path
 from typing import Dict, List, Any
-from .base_integrator import BaseIntegrator
-from ..models.trending import TrendingTopic
+try:
+    from .base_integrator import BaseIntegrator
+    from ..models.trending import TrendingTopic
+except ImportError:
+    from src.integrators.base_integrator import BaseIntegrator
+    from src.models.trending import TrendingTopic
 
 
 class TrendingIntegrator(BaseIntegrator):
@@ -45,22 +49,24 @@ class TrendingIntegrator(BaseIntegrator):
     def create_trending_page(self, topic):
         """Create individual trending topic page"""
         try:
+            # Get path manager for this location
+            path_manager = self.get_path_manager(f"integrated/trending/trend_{topic.slug}.html")
+            base_path = path_manager.get_base_path()
+            
             # Read template
-            template_content = self.get_trending_template()
+            template_content = self.get_trending_template(base_path)
             
             # Replace placeholders
             replacements = {
                 '{{TOPIC_TITLE}}': topic.title,
                 '{{TOPIC_DESCRIPTION}}': getattr(topic, 'description', f'Explore the latest on {topic.title}'),
                 '{{HEAT_SCORE}}': str(getattr(topic, 'heat_score', 0)),
-                '{{TREND_CONTENT}}': self.generate_trend_content(topic)
+                '{{TREND_CONTENT}}': self.generate_trend_content(topic, base_path)
             }
             
             content = template_content
             for placeholder, value in replacements.items():
                 content = content.replace(placeholder, value)
-                
-            # No navigation path fixes needed since file is in main integrated dir
             
             # Save file
             filename = self.integrated_dir / f"trend_{topic.slug}.html"
@@ -75,17 +81,19 @@ class TrendingIntegrator(BaseIntegrator):
     def create_trending_listing(self, topics):
         """Create trending topics listing page"""
         try:
+            # Get path manager for this location
+            path_manager = self.get_path_manager("integrated/trending.html")
+            base_path = path_manager.get_base_path()
+            
             # Read template
-            template_content = self.get_trending_listing_template()
+            template_content = self.get_trending_listing_template(base_path)
             
             # Generate trending cards
-            topics_html = self.generate_trending_cards(topics)
+            topics_html = self.generate_trending_cards(topics, base_path)
             
             # Replace placeholders
             content = template_content.replace('{{TRENDING_CONTENT}}', topics_html)
             content = content.replace('{{TOPIC_COUNT}}', str(len(topics)))
-            
-            # No navigation path fixes needed since file is in main integrated dir
             
             # Save file (listing goes in main integrated dir, not subfolder)
             from pathlib import Path
@@ -98,7 +106,7 @@ class TrendingIntegrator(BaseIntegrator):
         except Exception as e:
             self.update_progress(f"Error creating trending listing: {e}")
             
-    def generate_trending_cards(self, topics):
+    def generate_trending_cards(self, topics, base_path=""):
         """Generate HTML for trending topic cards"""
         cards_html = ""
         
@@ -147,14 +155,14 @@ class TrendingIntegrator(BaseIntegrator):
                 </div>
                 <div class="p-6">
                     <h3 class="text-xl font-bold mb-3 hover:text-indigo-600 transition">
-                        <a href="trending/trend_{topic.slug}.html">{self.escape_html(topic.title)}</a>
+                        <a href="{base_path}trending/trend_{topic.slug}.html">{self.escape_html(topic.title)}</a>
                     </h3>
                     <p class="text-gray-700 mb-4 text-sm">
                         {self.escape_html(getattr(topic, 'description', topic.title)[:150])}...
                     </p>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-500">🔥 Heat Score: {heat_score}</span>
-                        <a href="trending/trend_{topic.slug}.html" 
+                        <a href="{base_path}trending/trend_{topic.slug}.html" 
                            class="text-indigo-600 font-medium">Explore →</a>
                     </div>
                 </div>
@@ -163,7 +171,7 @@ class TrendingIntegrator(BaseIntegrator):
             
         return cards_html
         
-    def generate_trend_content(self, topic):
+    def generate_trend_content(self, topic, base_path=""):
         """Generate content for trending topic page"""
         content = getattr(topic, 'content', '')
         
@@ -222,24 +230,162 @@ class TrendingIntegrator(BaseIntegrator):
         
         return content
         
-    def get_trending_template(self):
+    def get_trending_template(self, base_path=""):
         """Get trending topic page template"""
-        return '''<!DOCTYPE html>
+        return ('''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{TOPIC_TITLE}} - Trending | Influencer News</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{base_path}assets/css/styles.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
         .hero-title { font-family: 'Playfair Display', serif; }
+    
+        /* Mobile Menu Styles */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background: #312e81;
+            transition: right 0.3s ease-in-out;
+            z-index: 1000;
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+        }
+        
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            z-index: 999;
+        }
+        
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .hamburger {
+            width: 30px;
+            height: 24px;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background: white;
+            border-radius: 3px;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+        
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+        
+        .mobile-nav-item {
+            display: block;
+            padding: 1rem 2rem;
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.3s ease;
+        }
+        
+        .mobile-nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Mobile Search Overlay */
+        .mobile-search-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        
+        .mobile-search-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="p-6 border-b border-indigo-600">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-white">Menu</h2>
+                <button id="closeMobileMenu" class="text-white text-2xl">&times;</button>
+            </div>
+        </div>
+        <nav class="p-6">
+            <ul class="space-y-4">
+                <li><a href="{base_path}index.html" class="mobile-nav-item block text-white text-lg py-2 border-b border-indigo-600/30">Home</a></li>
+                <li><a href="{base_path}search.html" class="mobile-nav-item block text-white text-lg py-2 border-b border-indigo-600/30">Search</a></li>
+                <li><a href="{base_path}authors.html" class="mobile-nav-item block text-white text-lg py-2 border-b border-indigo-600/30">Authors</a></li>
+                <li><a href="{base_path}integrated/categories.html" class="mobile-nav-item block text-white text-lg py-2 border-b border-indigo-600/30">Categories</a></li>
+                <li><a href="{base_path}integrated/trending.html" class="mobile-nav-item block text-indigo-200 text-lg py-2 border-b border-indigo-600/30">Trending</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Mobile Search Overlay -->
+    <div class="mobile-search-overlay" id="mobileSearchOverlay">
+        <div class="mobile-search-container">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Search</h2>
+                <button id="closeMobileSearch" class="text-gray-500 text-3xl">&times;</button>
+            </div>
+            <div class="relative mb-6">
+                <input type="text" id="mobileSearchInput" placeholder="Search articles, authors, categories..." 
+                       class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       onkeyup="handleMobileSearch(event)">
+                <button onclick="performMobileSearch()" 
+                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-indigo-600 text-xl">🔍</button>
+            </div>
+            <div id="mobileSearchSuggestions" class="bg-white border border-gray-200 rounded-lg hidden max-h-60 overflow-y-auto"></div>
+        </div>
+    </div>
+    
     <!-- Header -->
     <header class="bg-indigo-900 text-white sticky top-0 z-50 shadow-2xl">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -254,12 +400,18 @@ class TrendingIntegrator(BaseIntegrator):
             </div>
             <nav class="hidden md:block">
                 <ul class="flex space-x-8">
-                    <li><a href="../../index.html" class="hover:text-indigo-200 transition font-medium">Home</a></li>
-                    <li><a href="../../search.html" class="hover:text-indigo-200 transition font-medium">Search</a></li>
-                    <li><a href="../../authors.html" class="hover:text-indigo-200 transition font-medium">Authors</a></li>
-                    <li><a href="../categories.html" class="hover:text-indigo-200 transition font-medium">Categories</a></li>
-                    <li><a href="../trending.html" class="hover:text-indigo-200 transition font-medium text-indigo-200">Trending</a></li>
+                    <li><a href="{base_path}index.html" class="hover:text-indigo-200 transition font-medium">Home</a></li>
+                    <li><a href="{base_path}search.html" class="hover:text-indigo-200 transition font-medium">Search</a></li>
+                    <li><a href="{base_path}authors.html" class="hover:text-indigo-200 transition font-medium">Authors</a></li>
+                    <li><a href="{base_path}integrated/categories.html" class="hover:text-indigo-200 transition font-medium">Categories</a></li>
+                    <li><a href="{base_path}integrated/trending.html" class="hover:text-indigo-200 transition font-medium text-indigo-200">Trending</a></li>
                 </ul>
+                        <!-- Mobile Menu Button -->
+            <button class="md:hidden hamburger" id="mobileMenuToggle" aria-label="Toggle mobile menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             </nav>
         </div>
     </header>
@@ -295,8 +447,133 @@ class TrendingIntegrator(BaseIntegrator):
             <p>&copy; 2024 Influencer News. All rights reserved.</p>
         </div>
     </footer>
+    <script>
+
+        // Mobile Menu Functionality
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+        
+        function openMobileMenu() {
+            mobileMenu.classList.add('active');
+            mobileMenuOverlay.classList.add('active');
+            mobileMenuToggle.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMobileMenuFunc() {
+            mobileMenu.classList.remove('active');
+            mobileMenuOverlay.classList.remove('active');
+            mobileMenuToggle.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', openMobileMenu);
+        }
+        
+        if (closeMobileMenu) {
+            closeMobileMenu.addEventListener('click', closeMobileMenuFunc);
+        }
+        
+        if (mobileMenuOverlay) {
+            mobileMenuOverlay.addEventListener('click', closeMobileMenuFunc);
+        }
+        
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.mobile-nav-item').forEach(item => {
+            item.addEventListener('click', closeMobileMenuFunc);
+        });
+        
+        // Mobile Search Functionality
+        const mobileSearchToggle = document.getElementById('mobileSearchToggle');
+        const closeMobileSearchBtn = document.getElementById('closeMobileSearch');
+        const mobileSearchOverlay = document.getElementById('mobileSearchOverlay');
+        const mobileSearchInput = document.getElementById('mobileSearchInput');
+        const mobileSearchSuggestions = document.getElementById('mobileSearchSuggestions');
+        
+        const searchData = [
+            'MrBeast', 'Emma Chamberlain', 'PewDiePie', 'Charli DAmelio', 'Logan Paul',
+            'Creator Economy', 'TikTok Algorithm', 'YouTube Shorts', 'Instagram Reels',
+            'Brand Partnerships', 'Influencer Marketing', 'Social Media Trends'
+        ];
+        
+        function openMobileSearch() {
+            mobileSearchOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // Focus on search input after animation
+            setTimeout(() => {
+                mobileSearchInput.focus();
+            }, 300);
+        }
+        
+        function closeMobileSearchFunc() {
+            mobileSearchOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+            mobileSearchSuggestions.classList.add('hidden');
+            mobileSearchInput.value = '';
+        }
+        
+        if (mobileSearchToggle) {
+            mobileSearchToggle.addEventListener('click', openMobileSearch);
+        }
+        
+        if (closeMobileSearchBtn) {
+            closeMobileSearchBtn.addEventListener('click', closeMobileSearchFunc);
+        }
+        
+        if (mobileSearchOverlay) {
+            mobileSearchOverlay.addEventListener('click', function(e) {
+                if (e.target === mobileSearchOverlay) {
+                    closeMobileSearchFunc();
+                }
+            });
+        }
+        
+        function handleMobileSearch(event) {
+            const query = event.target.value.toLowerCase();
+            
+            if (query.length > 1) {
+                const matches = searchData.filter(item => 
+                    item.toLowerCase().includes(query)
+                ).slice(0, 5);
+                
+                if (matches.length > 0) {
+                    mobileSearchSuggestions.innerHTML = matches.map(match => 
+                        `<div class="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0" onclick="selectMobileSuggestion('${match}')">${match}</div>`
+                    ).join('');
+                    mobileSearchSuggestions.classList.remove('hidden');
+                } else {
+                    mobileSearchSuggestions.classList.add('hidden');
+                }
+            } else {
+                mobileSearchSuggestions.classList.add('hidden');
+            }
+            
+            if (event.key === 'Enter') {
+                performMobileSearch();
+            }
+        }
+        
+        function selectMobileSuggestion(suggestion) {
+            mobileSearchInput.value = suggestion;
+            mobileSearchSuggestions.classList.add('hidden');
+            performMobileSearch();
+        }
+        
+        function performMobileSearch() {
+            const query = mobileSearchInput.value;
+            if (query.trim()) {
+                // Close mobile search and redirect to search page
+                closeMobileSearchFunc();
+                window.location.href = `{base_path}search.html?q=${encodeURIComponent(query)}`;
+            }
+        }
+
+    </script>
 </body>
-</html>'''
+</html>''').replace('{base_path}', base_path)
 
     # Required abstract methods
     def parse_content_file(self, file_path: Path) -> Dict[str, Any]:
@@ -391,24 +668,162 @@ class TrendingIntegrator(BaseIntegrator):
             self.update_progress(f"Error processing trending topic: {str(e)}")
             return False
 
-    def get_trending_listing_template(self):
+    def get_trending_listing_template(self, base_path=""):
         """Get trending topics listing template"""
-        return '''<!DOCTYPE html>
+        return ('''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trending Topics - Influencer News</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{base_path}assets/css/styles.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
         .hero-title { font-family: 'Playfair Display', serif; }
+    
+        /* Mobile Menu Styles */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background: #312e81;
+            transition: right 0.3s ease-in-out;
+            z-index: 1000;
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+        }
+        
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            z-index: 999;
+        }
+        
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .hamburger {
+            width: 30px;
+            height: 24px;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background: white;
+            border-radius: 3px;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+        
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+        
+        .mobile-nav-item {
+            display: block;
+            padding: 1rem 2rem;
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.3s ease;
+        }
+        
+        .mobile-nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Mobile Search Overlay */
+        .mobile-search-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        
+        .mobile-search-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="p-6 border-b border-indigo-600">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-white">Menu</h2>
+                <button id="closeMobileMenu" class="text-white text-2xl">&times;</button>
+            </div>
+        </div>
+        <nav class="p-6">
+            <ul class="space-y-4">
+                <li><a href="{base_path}index.html" class="mobile-nav-item block text-white text-lg py-2 border-b border-indigo-600/30">Home</a></li>
+                <li><a href="{base_path}search.html" class="mobile-nav-item block text-white text-lg py-2 border-b border-indigo-600/30">Search</a></li>
+                <li><a href="{base_path}authors.html" class="mobile-nav-item block text-white text-lg py-2 border-b border-indigo-600/30">Authors</a></li>
+                <li><a href="{base_path}integrated/categories.html" class="mobile-nav-item block text-white text-lg py-2 border-b border-indigo-600/30">Categories</a></li>
+                <li><a href="{base_path}integrated/trending.html" class="mobile-nav-item block text-indigo-200 text-lg py-2 border-b border-indigo-600/30">Trending</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Mobile Search Overlay -->
+    <div class="mobile-search-overlay" id="mobileSearchOverlay">
+        <div class="mobile-search-container">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Search</h2>
+                <button id="closeMobileSearch" class="text-gray-500 text-3xl">&times;</button>
+            </div>
+            <div class="relative mb-6">
+                <input type="text" id="mobileSearchInput" placeholder="Search articles, authors, categories..." 
+                       class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       onkeyup="handleMobileSearch(event)">
+                <button onclick="performMobileSearch()" 
+                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-indigo-600 text-xl">🔍</button>
+            </div>
+            <div id="mobileSearchSuggestions" class="bg-white border border-gray-200 rounded-lg hidden max-h-60 overflow-y-auto"></div>
+        </div>
+    </div>
+    
     <!-- Header -->
     <header class="bg-indigo-900 text-white sticky top-0 z-50 shadow-2xl">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -423,12 +838,18 @@ class TrendingIntegrator(BaseIntegrator):
             </div>
             <nav class="hidden md:block">
                 <ul class="flex space-x-8">
-                    <li><a href="../../index.html" class="hover:text-indigo-200 transition font-medium">Home</a></li>
-                    <li><a href="../../search.html" class="hover:text-indigo-200 transition font-medium">Search</a></li>
-                    <li><a href="../../authors.html" class="hover:text-indigo-200 transition font-medium">Authors</a></li>
-                    <li><a href="../categories.html" class="hover:text-indigo-200 transition font-medium">Categories</a></li>
-                    <li><a href="../trending.html" class="hover:text-indigo-200 transition font-medium text-indigo-200">Trending</a></li>
+                    <li><a href="{base_path}index.html" class="hover:text-indigo-200 transition font-medium">Home</a></li>
+                    <li><a href="{base_path}search.html" class="hover:text-indigo-200 transition font-medium">Search</a></li>
+                    <li><a href="{base_path}authors.html" class="hover:text-indigo-200 transition font-medium">Authors</a></li>
+                    <li><a href="{base_path}integrated/categories.html" class="hover:text-indigo-200 transition font-medium">Categories</a></li>
+                    <li><a href="{base_path}integrated/trending.html" class="hover:text-indigo-200 transition font-medium text-indigo-200">Trending</a></li>
                 </ul>
+                        <!-- Mobile Menu Button -->
+            <button class="md:hidden hamburger" id="mobileMenuToggle" aria-label="Toggle mobile menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             </nav>
         </div>
     </header>
@@ -460,8 +881,134 @@ class TrendingIntegrator(BaseIntegrator):
             <p>&copy; 2024 Influencer News. All rights reserved.</p>
         </div>
     </footer>
+    <script>
+
+        // Mobile Menu Functionality
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+        
+        function openMobileMenu() {
+            mobileMenu.classList.add('active');
+            mobileMenuOverlay.classList.add('active');
+            mobileMenuToggle.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMobileMenuFunc() {
+            mobileMenu.classList.remove('active');
+            mobileMenuOverlay.classList.remove('active');
+            mobileMenuToggle.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', openMobileMenu);
+        }
+        
+        if (closeMobileMenu) {
+            closeMobileMenu.addEventListener('click', closeMobileMenuFunc);
+        }
+        
+        if (mobileMenuOverlay) {
+            mobileMenuOverlay.addEventListener('click', closeMobileMenuFunc);
+        }
+        
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.mobile-nav-item').forEach(item => {
+            item.addEventListener('click', closeMobileMenuFunc);
+        });
+        
+        // Mobile Search Functionality
+        const mobileSearchToggle = document.getElementById('mobileSearchToggle');
+        const closeMobileSearchBtn = document.getElementById('closeMobileSearch');
+        const mobileSearchOverlay = document.getElementById('mobileSearchOverlay');
+        const mobileSearchInput = document.getElementById('mobileSearchInput');
+        const mobileSearchSuggestions = document.getElementById('mobileSearchSuggestions');
+        
+        const searchData = [
+            'MrBeast', 'Emma Chamberlain', 'PewDiePie', 'Charli DAmelio', 'Logan Paul',
+            'Creator Economy', 'TikTok Algorithm', 'YouTube Shorts', 'Instagram Reels',
+            'Brand Partnerships', 'Influencer Marketing', 'Social Media Trends'
+        ];
+        
+        function openMobileSearch() {
+            mobileSearchOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // Focus on search input after animation
+            setTimeout(() => {
+                mobileSearchInput.focus();
+            }, 300);
+        }
+        
+        function closeMobileSearchFunc() {
+            mobileSearchOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+            mobileSearchSuggestions.classList.add('hidden');
+            mobileSearchInput.value = '';
+        }
+        
+        if (mobileSearchToggle) {
+            mobileSearchToggle.addEventListener('click', openMobileSearch);
+        }
+        
+        if (closeMobileSearchBtn) {
+            closeMobileSearchBtn.addEventListener('click', closeMobileSearchFunc);
+        }
+        
+        if (mobileSearchOverlay) {
+            mobileSearchOverlay.addEventListener('click', function(e) {
+                if (e.target === mobileSearchOverlay) {
+                    closeMobileSearchFunc();
+                }
+            });
+        }
+        
+        function handleMobileSearch(event) {
+            const query = event.target.value.toLowerCase();
+            
+            if (query.length > 1) {
+                const matches = searchData.filter(item => 
+                    item.toLowerCase().includes(query)
+                ).slice(0, 5);
+                
+                if (matches.length > 0) {
+                    mobileSearchSuggestions.innerHTML = matches.map(match => 
+                        `<div class="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0" onclick="selectMobileSuggestion('${match}')">${match}</div>`
+                    ).join('');
+                    mobileSearchSuggestions.classList.remove('hidden');
+                } else {
+                    mobileSearchSuggestions.classList.add('hidden');
+                }
+            } else {
+                mobileSearchSuggestions.classList.add('hidden');
+            }
+            
+            if (event.key === 'Enter') {
+                performMobileSearch();
+            }
+        }
+        
+        function selectMobileSuggestion(suggestion) {
+            mobileSearchInput.value = suggestion;
+            mobileSearchSuggestions.classList.add('hidden');
+            performMobileSearch();
+        }
+        
+        function performMobileSearch() {
+            const query = mobileSearchInput.value;
+            if (query.trim()) {
+                // Close mobile search and redirect to search page
+                closeMobileSearchFunc();
+                window.location.href = `{base_path}search.html?q=${encodeURIComponent(query)}`;
+            }
+        }
+
+    </script>
 </body>
-</html>'''
+</html>''').replace('{base_path}', base_path)
+    
     def update_all_listing_pages(self):
         """Update all listing pages with current trending topics from database"""
         self.update_progress("Updating trending listing pages...")

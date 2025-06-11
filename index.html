@@ -4,10 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Influencer News - Your Source for Influencer Culture</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/styles.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Influencer News">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
+    <meta name="msapplication-TileImage" content="assets/icons/icon-144x144.png">
+    <meta name="msapplication-TileColor" content="#4f46e5">
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -122,8 +132,170 @@
             }
         }
     </style>
+    <style>
+        /* Mobile Menu Styles */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background: #312e81;
+            transition: right 0.3s ease-in-out;
+            z-index: 1000;
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+        }
+        
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            z-index: 999;
+        }
+        
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .hamburger {
+            width: 30px;
+            height: 24px;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background: white;
+            border-radius: 3px;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+        
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+        
+        .mobile-nav-item {
+            display: block;
+            padding: 1rem 2rem;
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.3s ease;
+        }
+        
+        .mobile-nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Mobile Search Overlay */
+        .mobile-search-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        
+        .mobile-search-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="p-6 border-b border-indigo-700">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-400 to-purple-600 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-lg font-bold text-white">IN</span>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Menu</h2>
+                    </div>
+                </div>
+                <button class="text-white text-2xl" id="closeMobileMenu">&times;</button>
+            </div>
+        </div>
+        <nav class="py-4">
+            <a href="index.html" class="mobile-nav-item">🏠 Home</a>
+            <a href="search.html" class="mobile-nav-item">🔍 Search</a>
+            <a href="authors.html" class="mobile-nav-item">👥 Authors</a>
+            <a href="integrated/categories.html" class="mobile-nav-item">📂 Categories</a>
+            <a href="integrated/trending.html" class="mobile-nav-item">🔥 Trending</a>
+            <a href="#contact" class="mobile-nav-item">📧 Contact</a>
+        </nav>
+        <div class="p-6 mt-auto">
+            <div class="bg-indigo-700 rounded-lg p-4">
+                <h3 class="text-white font-bold mb-2">Newsletter</h3>
+                <p class="text-indigo-200 text-sm mb-3">Get the latest influencer news</p>
+                <button class="bg-white text-indigo-700 px-4 py-2 rounded-md text-sm font-semibold w-full">Subscribe</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile Search Overlay -->
+    <div class="mobile-search-overlay" id="mobileSearchOverlay">
+        <div class="p-4 bg-indigo-900">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-white font-bold text-lg">Search</h3>
+                <button class="text-white text-2xl" id="closeMobileSearch">&times;</button>
+            </div>
+            <div class="relative">
+                <input 
+                    type="text" 
+                    id="mobileSearchInput" 
+                    placeholder="Search articles, authors..." 
+                    class="w-full p-4 pr-12 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    onkeyup="handleMobileSearch(event)"
+                >
+                <button onclick="performMobileSearch()" class="absolute right-4 top-4 text-gray-600 hover:text-indigo-600 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </button>
+            </div>
+            <!-- Mobile Search Suggestions -->
+            <div id="mobileSearchSuggestions" class="mt-4 bg-white rounded-lg shadow-lg hidden max-h-60 overflow-y-auto">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
     <!-- News Alert Banner -->
     <div class="alert-banner text-white text-center py-3 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
@@ -144,6 +316,13 @@
                     <p class="text-xs text-indigo-200">Breaking stories • Real insights</p>
                 </div>
             </div>
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden hamburger" id="mobileMenuToggle" aria-label="Toggle mobile menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
             <nav class="hidden md:block">
                 <ul class="flex space-x-8">
                     <li><a href="index.html" class="nav-link hover:text-indigo-200 transition font-medium text-indigo-200">Home</a></li>
@@ -154,8 +333,8 @@
                     <li><a href="#contact" class="nav-link hover:text-indigo-200 transition font-medium">Contact</a></li>
                 </ul>
             </nav>
-            <!-- Enhanced Search Bar -->
-            <div class="relative">
+            <!-- Enhanced Search Bar - Desktop Only -->
+            <div class="relative hidden md:block">
                 <input 
                     type="text" 
                     id="searchInput" 
@@ -173,6 +352,13 @@
                     <!-- Populated by JavaScript -->
                 </div>
             </div>
+            
+            <!-- Mobile Search Button -->
+            <button class="md:hidden text-white p-2" id="mobileSearchToggle" aria-label="Toggle mobile search">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </button>
         </div>
         
         <!-- Enhanced Live Ticker -->
@@ -200,41 +386,41 @@
         </div>
         
         <div class="hero-content container mx-auto px-4">
-            <h2 class="hero-title text-6xl font-bold mb-6 leading-tight">
+            <h2 class="hero-title text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 The Future of 
                 <span class="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
                     Influence
                 </span>
                 <br>Starts Here
             </h2>
-            <p class="text-xl mb-8 max-w-3xl mx-auto leading-relaxed opacity-90">
+            <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto leading-relaxed opacity-90">
                 Breaking stories, exclusive interviews, and deep insights from the world's most influential creators. 
                 Stay ahead of the trends that shape digital culture.
             </p>
             
             <!-- CTA Buttons -->
             <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-                <a href="#articles" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-full hover:from-indigo-700 hover:to-purple-700 transition text-lg font-semibold shadow-lg hover:shadow-xl">
+                <a href="#articles" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-full hover:from-indigo-700 hover:to-purple-700 transition text-base md:text-lg font-semibold shadow-lg hover:shadow-xl">
                     🔥 Latest Breaking News
                 </a>
-                <a href="#newsletter" class="glassmorphism text-white px-8 py-4 rounded-full hover:bg-white/20 transition text-lg font-semibold">
+                <a href="#newsletter" class="glassmorphism text-white px-6 md:px-8 py-3 md:py-4 rounded-full hover:bg-white/20 transition text-base md:text-lg font-semibold">
                     📧 Join 50K+ Subscribers
                 </a>
             </div>
 
             <!-- Live Stats -->
-            <div class="grid grid-cols-3 gap-8 max-w-2xl mx-auto glassmorphism rounded-2xl p-6">
+            <div class="grid grid-cols-3 gap-4 md:gap-8 max-w-2xl mx-auto glassmorphism rounded-2xl p-4 md:p-6">
                 <div class="social-stat text-center">
-                    <div class="text-2xl font-bold" id="liveReaders">47,892</div>
-                    <div class="text-sm opacity-75">Live Readers</div>
+                    <div class="text-xl md:text-2xl font-bold" id="liveReaders">47,892</div>
+                    <div class="text-xs md:text-sm opacity-75">Live Readers</div>
                 </div>
                 <div class="social-stat text-center">
-                    <div class="text-2xl font-bold">156</div>
-                    <div class="text-sm opacity-75">Stories Today</div>
+                    <div class="text-xl md:text-2xl font-bold">156</div>
+                    <div class="text-xs md:text-sm opacity-75">Stories Today</div>
                 </div>
                 <div class="social-stat text-center">
-                    <div class="text-2xl font-bold">2.1M</div>
-                    <div class="text-sm opacity-75">Monthly Views</div>
+                    <div class="text-xl md:text-2xl font-bold">2.1M</div>
+                    <div class="text-xs md:text-sm opacity-75">Monthly Views</div>
                 </div>
             </div>
         </div>
@@ -294,14 +480,14 @@
 
                 <div class="article-card bg-white rounded-xl shadow-lg overflow-hidden md:col-span-2 lg:col-span-1">
                     <div class="relative">
-                        <img src="assets/images/articles/article_10_hero.jpg" alt="New Platform Update Changes Everything for Creators" class="w-full h-48 object-cover" loading="lazy">
+                        <img src="assets/images/articles/article_5_hero.jpg" alt="New Platform Update Changes Everything for Creators" class="w-full h-48 object-cover">
                         <div class="absolute top-4 right-4">
                             <span class="category-Technology bg-white/90 px-2 py-1 rounded text-xs font-bold uppercase">Technology</span>
                         </div>
                     </div>
                     <div class="p-6">
                         <div class="flex items-center gap-2 mb-3">
-                            <span class="text-gray-500 text-sm">Alex Rivera • 1 hour ago</span>
+                            <span class="text-gray-500 text-sm">Alex Rivera • 2 minutes ago</span>
                         </div>
                         <h3 class="text-lg font-bold mb-3 hover:text-indigo-600 transition cursor-pointer">
                             New Platform Update Changes Everything for Creators
@@ -310,8 +496,8 @@
                             Major social media platform announces algorithm changes that could reshape how creators build audiences and earn revenue in 2025.
                         </p>
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-gray-500">👁 26,574 views</span>
-                            <a href="integrated/articles/article_10.html" class="text-indigo-600 font-medium cursor-pointer">Read →</a>
+                            <span class="text-gray-500">👁 20,201 views</span>
+                            <a href="integrated/articles/article_5.html" class="text-indigo-600 font-medium cursor-pointer">Read →</a>
                         </div>
                     </div>
                 </div>
@@ -673,10 +859,253 @@
             });
         });
 
+        // Mobile Menu Functionality
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+        
+        function openMobileMenu() {
+            mobileMenu.classList.add('active');
+            mobileMenuOverlay.classList.add('active');
+            mobileMenuToggle.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMobileMenuFunc() {
+            mobileMenu.classList.remove('active');
+            mobileMenuOverlay.classList.remove('active');
+            mobileMenuToggle.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', openMobileMenu);
+        }
+        
+        if (closeMobileMenu) {
+            closeMobileMenu.addEventListener('click', closeMobileMenuFunc);
+        }
+        
+        if (mobileMenuOverlay) {
+            mobileMenuOverlay.addEventListener('click', closeMobileMenuFunc);
+        }
+        
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.mobile-nav-item').forEach(item => {
+            item.addEventListener('click', closeMobileMenuFunc);
+        });
+        
+        // Mobile Search Functionality
+        const mobileSearchToggle = document.getElementById('mobileSearchToggle');
+        const closeMobileSearch = document.getElementById('closeMobileSearch');
+        const mobileSearchOverlay = document.getElementById('mobileSearchOverlay');
+        const mobileSearchInput = document.getElementById('mobileSearchInput');
+        const mobileSearchSuggestions = document.getElementById('mobileSearchSuggestions');
+        
+        function openMobileSearch() {
+            mobileSearchOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // Focus on search input after animation
+            setTimeout(() => {
+                mobileSearchInput.focus();
+            }, 300);
+        }
+        
+        function closeMobileSearchFunc() {
+            mobileSearchOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+            mobileSearchSuggestions.classList.add('hidden');
+            mobileSearchInput.value = '';
+        }
+        
+        if (mobileSearchToggle) {
+            mobileSearchToggle.addEventListener('click', openMobileSearch);
+        }
+        
+        if (closeMobileSearch) {
+            closeMobileSearch.addEventListener('click', closeMobileSearchFunc);
+        }
+        
+        if (mobileSearchOverlay) {
+            mobileSearchOverlay.addEventListener('click', function(e) {
+                if (e.target === mobileSearchOverlay) {
+                    closeMobileSearchFunc();
+                }
+            });
+        }
+        
+        function handleMobileSearch(event) {
+            const query = event.target.value.toLowerCase();
+            
+            if (query.length > 1) {
+                const matches = searchData.filter(item => 
+                    item.toLowerCase().includes(query)
+                ).slice(0, 5);
+                
+                if (matches.length > 0) {
+                    mobileSearchSuggestions.innerHTML = matches.map(match => 
+                        `<div class="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0" onclick="selectMobileSuggestion('${match}')">${match}</div>`
+                    ).join('');
+                    mobileSearchSuggestions.classList.remove('hidden');
+                } else {
+                    mobileSearchSuggestions.classList.add('hidden');
+                }
+            } else {
+                mobileSearchSuggestions.classList.add('hidden');
+            }
+            
+            if (event.key === 'Enter') {
+                performMobileSearch();
+            }
+        }
+        
+        function selectMobileSuggestion(suggestion) {
+            mobileSearchInput.value = suggestion;
+            mobileSearchSuggestions.classList.add('hidden');
+            performMobileSearch();
+        }
+        
+        function performMobileSearch() {
+            const query = mobileSearchInput.value;
+            if (query.trim()) {
+                // Close mobile search and redirect to search page
+                closeMobileSearchFunc();
+                window.location.href = `search.html?q=${encodeURIComponent(query)}`;
+            }
+        }
+        
         // Add some analytics simulation
         setTimeout(() => {
             console.log('📊 Analytics: Page viewed, user engagement tracked');
         }, 2000);
+        
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('✓ Service Worker registered successfully');
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Show update notification
+                                    showUpdateNotification();
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.log('❌ Service Worker registration failed:', error);
+                    });
+            });
+        }
+        
+        // PWA Install Prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallPromotion();
+        });
+        
+        function showInstallPromotion() {
+            const installBanner = document.createElement('div');
+            installBanner.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #4f46e5, #7c3aed);
+                color: white;
+                padding: 16px;
+                border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                animation: slideUp 0.3s ease;
+            `;
+            
+            installBanner.innerHTML = `
+                <div>
+                    <div style="font-weight: 600; margin-bottom: 4px;">📱 Install Influencer News</div>
+                    <div style="font-size: 14px; opacity: 0.9;">Get faster access and offline reading</div>
+                </div>
+                <div>
+                    <button id="installButton" style="background: white; color: #4f46e5; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; margin-right: 8px; cursor: pointer;">Install</button>
+                    <button id="dismissInstall" style="background: transparent; color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 12px; border-radius: 8px; cursor: pointer;">×</button>
+                </div>
+            `;
+            
+            document.body.appendChild(installBanner);
+            
+            // Install button handler
+            document.getElementById('installButton').addEventListener('click', () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('✓ PWA installation accepted');
+                        }
+                        deferredPrompt = null;
+                        installBanner.remove();
+                    });
+                }
+            });
+            
+            // Dismiss button handler
+            document.getElementById('dismissInstall').addEventListener('click', () => {
+                installBanner.remove();
+            });
+            
+            // Auto dismiss after 10 seconds
+            setTimeout(() => {
+                if (installBanner.parentNode) {
+                    installBanner.remove();
+                }
+            }, 10000);
+        }
+        
+        function showUpdateNotification() {
+            const updateBanner = document.createElement('div');
+            updateBanner.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: white;
+                padding: 16px;
+                border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            `;
+            
+            updateBanner.innerHTML = `
+                <div>
+                    <div style="font-weight: 600; margin-bottom: 4px;">🔄 Update Available</div>
+                    <div style="font-size: 14px; opacity: 0.9;">Refresh to get the latest features</div>
+                </div>
+                <button id="refreshButton" style="background: white; color: #10b981; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer;">Refresh</button>
+            `;
+            
+            document.body.appendChild(updateBanner);
+            
+            document.getElementById('refreshButton').addEventListener('click', () => {
+                window.location.reload();
+            });
+        }
     </script>
+    
+    <!-- Mobile Touch Enhancements -->
+    <script src="assets/js/mobile-touch.js"></script>
 </body>
 </html>

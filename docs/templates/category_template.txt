@@ -1,11 +1,12 @@
 Name: [Category Name]
 Slug: [url-friendly-slug]
-Icon: [Emoji icon]
-Color: [Color name: blue, green, red, purple, orange, pink, yellow, indigo, teal, gray]
-Description: [Brief description for category overview]
-Featured: [true/false - whether to feature prominently]
-Sort_Order: [Number for ordering categories]
-Keywords: [Comma-separated list of related keywords/topics]
+Icon: [Emoji icon - optional]
+Color: [Color name: blue, green, red, purple, orange, pink, yellow, indigo, teal, gray - optional]
+Description: [Brief description for category overview - extended content below will be appended]
+Is_Featured: [true/false - whether to feature prominently - defaults to false]
+Sort_Order: [Number for ordering categories - defaults to 0]
+Parent_ID: [ID of parent category for hierarchical categories - optional, leave blank for root categories]
+Keywords: [Comma-separated list of related keywords/topics - note: not stored in model, used for reference only]
 
 ---
 

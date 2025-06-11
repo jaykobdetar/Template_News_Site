@@ -8,26 +8,26 @@ Your CMS uses a **database-first approach** where all content is stored in SQLit
 
 ## 🛠️ Management Tools
 
-### Command-Line Tool (`sync_content.py`)
+### Command-Line Tool (`scripts/sync_content.py`)
 
 The simplified primary tool for content management:
 
 ```bash
 # Sync all content (most common - recommended)
-python3 sync_content.py
-python3 sync_content.py sync
+python3 scripts/sync_content.py
+python3 scripts/sync_content.py sync
 
 # Sync specific content types
-python3 sync_content.py articles
-python3 sync_content.py authors
-python3 sync_content.py categories
-python3 sync_content.py trending
+python3 scripts/sync_content.py articles
+python3 scripts/sync_content.py authors
+python3 scripts/sync_content.py categories
+python3 scripts/sync_content.py trending
 
 # View content statistics
-python3 sync_content.py stats
+python3 scripts/sync_content.py stats
 
 # Check database connection and system status
-python3 sync_content.py status
+python3 scripts/sync_content.py status
 ```
 
 **Key Features:**
@@ -36,12 +36,12 @@ python3 sync_content.py status
 - **Foreign Key Protection**: Prevents deletion of referenced content with clear error messages
 - **Performance Optimized**: Handles thousands of articles without memory issues
 
-### GUI Content Manager (`content_manager.py`)
+### GUI Content Manager (`scripts/content_manager.py`)
 
 Visual interface for content management (requires tkinter):
 
 ```bash
-python3 content_manager.py
+python3 scripts/content_manager.py
 ```
 
 **GUI Features:**
