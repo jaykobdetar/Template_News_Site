@@ -81,7 +81,9 @@ CREATE TABLE trending_topics (
     content TEXT,               -- Detailed analysis
     heat_score INTEGER DEFAULT 0,  -- 0-100
     growth_rate REAL DEFAULT 0.0,  -- Percentage
+    momentum REAL DEFAULT 0.0,     -- Rate of heat score change
     article_count INTEGER DEFAULT 0,
+    related_articles TEXT,         -- JSON array of article IDs
     hashtag TEXT,
     icon TEXT DEFAULT '🔥',         -- Emoji icon
     category_id INTEGER,
@@ -93,6 +95,7 @@ CREATE TABLE trending_topics (
     mentions_instagram INTEGER DEFAULT 0,
     mentions_twitter INTEGER DEFAULT 0,
     mentions_twitch INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT 1,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id)
