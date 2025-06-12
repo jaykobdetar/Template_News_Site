@@ -64,13 +64,18 @@ class CategoryIntegrator(BaseIntegrator):
             # Generate article cards
             articles_html = self.generate_article_cards(articles, category.slug, base_path)
             
+            # Generate dynamic search data
+            search_data = self.generate_dynamic_search_data()
+            search_data_js = str(search_data).replace("'", '"')  # Convert to JS array format
+            
             # Replace placeholders
             replacements = {
                 '{{CATEGORY_NAME}}': category.name,
                 '{{CATEGORY_DESCRIPTION}}': getattr(category, 'description', f'Latest news and updates about {category.name.lower()}'),
                 '{{CATEGORY_COLOR}}': getattr(category, 'color', '#4F46E5'),
                 '{{ARTICLES_CONTENT}}': articles_html,
-                '{{ARTICLE_COUNT}}': str(len(articles))
+                '{{ARTICLE_COUNT}}': str(len(articles)),
+                '{{SEARCH_DATA}}': search_data_js
             }
             
             content = template_content
@@ -100,9 +105,14 @@ class CategoryIntegrator(BaseIntegrator):
             # Generate category cards
             categories_html = self.generate_category_cards(categories, base_path)
             
+            # Generate dynamic search data
+            search_data = self.generate_dynamic_search_data()
+            search_data_js = str(search_data).replace("'", '"')  # Convert to JS array format
+            
             # Replace placeholders
             content = template_content.replace('{{CATEGORIES_CONTENT}}', categories_html)
             content = content.replace('{{CATEGORY_COUNT}}', str(len(categories)))
+            content = content.replace('{{SEARCH_DATA}}', search_data_js)
             
             # Save file (listing goes in main integrated dir, not subfolder)
             from pathlib import Path
@@ -171,10 +181,21 @@ class CategoryIntegrator(BaseIntegrator):
             views = getattr(article, 'views', 0)
             views_formatted = f"{views:,}" if isinstance(views, int) else str(views)
             
+            # Handle image URL properly - use proper assets structure
+            image_url = getattr(article, 'image_url', None)
+            if not image_url or image_url == 'None' or image_url is None:
+                image_url = f"{base_path}assets/placeholders/article_placeholder.svg"
+            elif image_url.startswith('http'):
+                # External URLs should be converted to local assets
+                image_url = f"{base_path}assets/images/articles/article_{article.id}_hero.jpg"
+            elif not image_url.startswith(('/', 'assets')):
+                # Ensure proper assets folder structure
+                image_url = f"{base_path}assets/images/articles/{image_url}"
+            
             cards_html += f'''
             <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                 <div class="relative">
-                    <img src="{base_path}{getattr(article, 'image_url', 'assets/placeholders/article_placeholder.svg')}" 
+                    <img src="{image_url}" 
                          alt="{self.escape_html(article.title)}" 
                          class="w-full h-48 object-cover">
                 </div>
@@ -198,6 +219,56 @@ class CategoryIntegrator(BaseIntegrator):
             '''
             
         return cards_html
+    
+    def generate_dynamic_search_data(self):
+        """Generate dynamic search data from database"""
+        try:
+            # Get categories, authors, and popular article titles
+            from ..models.category import Category
+            from ..models.author import Author
+            from ..models.article import Article
+            
+            search_items = []
+            
+            # Add category names
+            categories = Category.find_all()
+            for category in categories:
+                search_items.append(category.name)
+            
+            # Add author names
+            authors = Author.find_all(limit=20)  # Top 20 authors
+            for author in authors:
+                search_items.append(author.name)
+            
+            # Add popular article titles (first few words)
+            articles = Article.find_all(limit=15)  # Top 15 articles
+            for article in articles:
+                # Extract first 2-3 significant words from title
+                title_words = article.title.split()[:3]
+                if len(title_words) >= 2:
+                    search_items.append(' '.join(title_words))
+            
+            # Add some general search terms if list is too short
+            if len(search_items) < 10:
+                fallback_terms = [
+                    'Creator Economy', 'Social Media', 'Content Creation', 
+                    'Brand Partnerships', 'Influencer Marketing', 'Platform Updates',
+                    'YouTube', 'TikTok', 'Instagram', 'Trending Content'
+                ]
+                search_items.extend(fallback_terms)
+            
+            # Remove duplicates and limit to reasonable number
+            search_items = list(dict.fromkeys(search_items))[:20]
+            
+            return search_items
+            
+        except Exception as e:
+            self.update_progress(f"Error generating search data: {e}")
+            # Fallback to basic terms
+            return [
+                'Creator Economy', 'Social Media', 'Content Creation',
+                'Brand Partnerships', 'Influencer Marketing', 'Platform Updates'
+            ]
         
     def get_category_template(self, base_path=""):
         """Get category page template"""
@@ -465,11 +536,7 @@ class CategoryIntegrator(BaseIntegrator):
         const mobileSearchInput = document.getElementById('mobileSearchInput');
         const mobileSearchSuggestions = document.getElementById('mobileSearchSuggestions');
         
-        const searchData = [
-            'MrBeast', 'Emma Chamberlain', 'PewDiePie', 'Charli DAmelio', 'Logan Paul',
-            'Creator Economy', 'TikTok Algorithm', 'YouTube Shorts', 'Instagram Reels',
-            'Brand Partnerships', 'Influencer Marketing', 'Social Media Trends'
-        ];
+        const searchData = {{SEARCH_DATA}};
         
         function openMobileSearch() {
             mobileSearchOverlay.classList.add('active');
@@ -909,11 +976,7 @@ class CategoryIntegrator(BaseIntegrator):
         const mobileSearchInput = document.getElementById('mobileSearchInput');
         const mobileSearchSuggestions = document.getElementById('mobileSearchSuggestions');
         
-        const searchData = [
-            'MrBeast', 'Emma Chamberlain', 'PewDiePie', 'Charli DAmelio', 'Logan Paul',
-            'Creator Economy', 'TikTok Algorithm', 'YouTube Shorts', 'Instagram Reels',
-            'Brand Partnerships', 'Influencer Marketing', 'Social Media Trends'
-        ];
+        const searchData = {{SEARCH_DATA}};
         
         function openMobileSearch() {
             mobileSearchOverlay.classList.add('active');

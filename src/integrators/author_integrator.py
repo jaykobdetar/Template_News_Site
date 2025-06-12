@@ -116,10 +116,14 @@ class AuthorIntegrator(BaseIntegrator):
         author = Author(
             name=content_data['name'],
             slug=slug,
+            title=content_data['title'],
             bio=content_data['bio'],
+            location=content_data.get('location'),
             expertise=', '.join(content_data['expertise']),
             linkedin=content_data.get('linkedin'),
-            twitter=content_data.get('twitter')
+            twitter=content_data.get('twitter'),
+            rating=content_data.get('rating', 0.0),
+            joined_date=content_data.get('joined_date', '2025-01-01')
         )
         author.save()
         
@@ -158,7 +162,7 @@ class AuthorIntegrator(BaseIntegrator):
             )
         else:
             # Use placeholder
-            img_tag = f'<img src="{base_path}assets/placeholders/author_placeholder.jpg" alt="{author.name}" class="rounded-full object-cover">'
+            img_tag = f'<img src="{base_path}assets/placeholders/author_placeholder.svg" alt="{author.name}" class="rounded-full object-cover">'
         
         # Create HTML content for author page with mobile support
         html_content = f'''<!DOCTYPE html>
@@ -540,10 +544,10 @@ class AuthorIntegrator(BaseIntegrator):
                     </div>
                     <div>
                         <h1 class="text-4xl font-bold text-white mb-2">{self.escape_html(author.name)}</h1>
-                        <p class="text-xl text-indigo-100 mb-4">Senior Correspondent</p>
+                        <p class="text-xl text-indigo-100 mb-4">{self.escape_html(author.title or 'Contributor')}</p>
                         <div class="flex space-x-4">
                             {'<span class="bg-indigo-500 text-white px-3 py-1 rounded-full text-sm">✓ Verified</span>' if hasattr(author, 'verified') else ''}
-                            <span class="bg-white/20 text-white px-3 py-1 rounded-full text-sm">📍 {self.escape_html(getattr(author, 'location', 'Remote'))}</span>
+                            {f'<span class="bg-white/20 text-white px-3 py-1 rounded-full text-sm">📍 {self.escape_html(author.location)}</span>' if author.location else ''}
                         </div>
                     </div>
                 </div>
@@ -571,11 +575,11 @@ class AuthorIntegrator(BaseIntegrator):
                                 <div class="text-sm text-gray-600">Articles</div>
                             </div>
                             <div class="bg-gray-50 p-4 rounded-lg text-center">
-                                <div class="text-2xl font-bold text-indigo-600">4.8</div>
+                                <div class="text-2xl font-bold text-indigo-600">{author.rating if hasattr(author, 'rating') and author.rating else 'N/A'}</div>
                                 <div class="text-sm text-gray-600">Rating</div>
                             </div>
                             <div class="bg-gray-50 p-4 rounded-lg text-center">
-                                <div class="text-2xl font-bold text-indigo-600">2020</div>
+                                <div class="text-2xl font-bold text-indigo-600">{author.joined_date.split('-')[0] if author.joined_date else 'N/A'}</div>
                                 <div class="text-sm text-gray-600">Joined</div>
                             </div>
                         </div>
@@ -801,7 +805,7 @@ class AuthorIntegrator(BaseIntegrator):
                     base_path
                 )
             else:
-                img_tag = f'<img src="{base_path}assets/placeholders/article_placeholder.jpg" alt="{article.title}" class="w-full h-48 object-cover">'
+                img_tag = f'<img src="{base_path}assets/placeholders/article_placeholder.svg" alt="{article.title}" class="w-full h-48 object-cover">'
             
             card = f'''
             <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
@@ -859,7 +863,7 @@ class AuthorIntegrator(BaseIntegrator):
                     base_path
                 )
             else:
-                img_tag = f'<img src="{base_path}assets/placeholders/author_placeholder.jpg" alt="{author.name}" class="w-24 h-24 rounded-full object-cover">'
+                img_tag = f'<img src="{base_path}assets/placeholders/author_placeholder.svg" alt="{author.name}" class="w-24 h-24 rounded-full object-cover">'
             
             article_count = author.get_article_count()
             
@@ -873,7 +877,7 @@ class AuthorIntegrator(BaseIntegrator):
                                 {self.escape_html(author.name)}
                             </a>
                         </h3>
-                        <p class="text-gray-600">Senior Correspondent</p>
+                        <p class="text-gray-600">{self.escape_html(author.title or 'Contributor')}</p>
                     </div>
                 </div>
                 <p class="text-gray-700 mb-4 line-clamp-3">{self.escape_html(author.bio)}</p>

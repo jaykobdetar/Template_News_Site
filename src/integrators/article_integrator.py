@@ -33,35 +33,35 @@ class ArticleIntegrator(BaseIntegrator):
             'sarah chen': {
                 'name': 'Sarah Chen',
                 'title': 'Senior Business Reporter',
-                'image': 'https://images.unsplash.com/photo-1494790108755-2616c395d75b?w=50&h=50&fit=crop&crop=face',
+                'image': 'assets/images/authors/sarah_chen_profile.jpg',
                 'bio': 'Former TechCrunch senior writer specializing in creator economy trends.',
                 'expertise': ['Creator Economy', 'Business', 'Startups']
             },
             'michael torres': {
                 'name': 'Michael Torres', 
                 'title': 'Entertainment Editor',
-                'image': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face',
+                'image': 'assets/images/authors/michael_torres_profile.jpg',
                 'bio': 'Celebrity culture and entertainment industry veteran.',
                 'expertise': ['Celebrity News', 'Entertainment', 'Exclusive Interviews']
             },
             'alex rivera': {
                 'name': 'Alex Rivera',
                 'title': 'Tech Correspondent', 
-                'image': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
+                'image': 'assets/images/authors/alex_rivera_profile.jpg',
                 'bio': 'Platform algorithm specialist and former software engineer.',
                 'expertise': ['Algorithms', 'Platform Updates', 'Tech Analysis']
             },
             'jessica kim': {
                 'name': 'Jessica Kim',
                 'title': 'Beauty & Fashion Editor',
-                'image': 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop&crop=face', 
+                'image': 'assets/images/authors/jessica_kim_profile.jpg', 
                 'bio': 'Former Vogue digital editor covering beauty influencer partnerships.',
                 'expertise': ['Beauty', 'Fashion', 'Influencer Collabs']
             },
             'david park': {
                 'name': 'David Park',
                 'title': 'Markets & Economics Editor',
-                'image': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face',
+                'image': 'assets/images/authors/david_park_profile.jpg',
                 'bio': 'Former Goldman Sachs analyst specializing in creator economy.',
                 'expertise': ['Market Analysis', 'Economics', 'Data Science']
             }
@@ -88,7 +88,7 @@ class ArticleIntegrator(BaseIntegrator):
                 author_info = self.authors.get(author_key, {
                     'name': author_name,
                     'title': 'Contributor',
-                    'image': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
+                    'image': 'assets/placeholders/author_placeholder.svg',
                     'bio': 'Contributing writer for Influencer News.',
                     'expertise': ['General']
                 })
@@ -153,7 +153,7 @@ class ArticleIntegrator(BaseIntegrator):
         author_info = self.authors.get(author_key, {
             'name': metadata['author'],
             'title': 'Contributor',
-            'image': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
+            'image': 'assets/placeholders/author_placeholder.svg',
             'bio': 'Contributing writer for Influencer News.',
             'expertise': [metadata.get('category', 'General').title()]
         })
@@ -292,6 +292,17 @@ class ArticleIntegrator(BaseIntegrator):
             '1,247,892': views_formatted,
             '24,156': likes_formatted,
             '2,847': comments_formatted,
+            # Fix breadcrumb replacements
+            'search.html?q=business': f"search.html?q={article['category'].lower()}",
+            '>Business<': f">{article['category'].title()}<",
+            '>MrBeast Creator Fund<': f">{article['title'][:50] + '...' if len(article['title']) > 50 else article['title']}<",
+            # Fix sidebar author references
+            'Jessica Kim': article['author_info']['name'],
+            'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face': article['author_info']['image'].replace('w=50&h=50', 'w=80&h=80'),
+            'Follow Sarah': f"Follow {article['author_info']['name'].split()[0]}",
+            # Fix share functionality
+            '"MrBeast Announces Revolutionary $100M Creator Support Fund"': f'"{article["title"]}"',
+            'alt="MrBeast Creator Fund Announcement"': f'alt="{article["title"]}"',
         }
         
         # Apply replacements
@@ -581,7 +592,7 @@ End your article with a strong conclusion that ties everything together and prov
             author_info = self.authors.get(author_key, {
                 'name': author_name,
                 'title': 'Contributor',
-                'image': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
+                'image': 'assets/placeholders/author_placeholder.svg',
                 'bio': 'Contributing writer for Influencer News.',
                 'expertise': ['General']
             })

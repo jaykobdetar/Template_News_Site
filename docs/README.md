@@ -14,7 +14,8 @@ Welcome to the complete documentation for the Influencer News CMS - a modern, da
 ### User Guides
 - **[Content Management Guide](content-management.md)** - How to add, edit, and manage content
 - **[Script Usage Guide](script-usage.md)** - How to run scripts and tools
-- **[Content Templates](templates/)** - Ready-to-use templates for all content types
+- **[Content Templates](templates/)** - Dynamic templates with field placeholders
+- **[Template System Migration](template-system-migration.md)** - Updated to granular template system
 - **[Image Management](image-management.md)** - Working with images and media
 - **[Search System](search-system.md)** - Understanding and using the search functionality
 

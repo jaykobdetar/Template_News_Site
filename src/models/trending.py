@@ -27,6 +27,20 @@ class TrendingTopic(BaseModel):
         self.is_active: bool = kwargs.get('is_active', True)  # Whether topic is active
         self.momentum: float = kwargs.get('momentum', 0.0)  # Rate of heat score change
         
+        # Additional rich data fields for trending topics
+        self.analysis: Optional[str] = kwargs.get('analysis')  # Rich analysis content
+        self.growth_rate: float = kwargs.get('growth_rate', 0.0)  # Growth rate percentage
+        self.hashtag: Optional[str] = kwargs.get('hashtag')  # Associated hashtag
+        self.status: str = kwargs.get('status', 'active')  # Topic status
+        
+        # Platform-specific data
+        self.platform_data: Dict[str, Any] = kwargs.get('platform_data', {})
+        self.mentions_youtube: int = kwargs.get('mentions_youtube', 0)
+        self.mentions_tiktok: int = kwargs.get('mentions_tiktok', 0)
+        self.mentions_instagram: int = kwargs.get('mentions_instagram', 0)
+        self.mentions_twitter: int = kwargs.get('mentions_twitter', 0)
+        self.mentions_twitch: int = kwargs.get('mentions_twitch', 0)
+        
         # Handle related articles as JSON
         related = kwargs.get('related_articles')
         if isinstance(related, str):

@@ -150,10 +150,10 @@ All content lives in the SQLite database (`data/infnews.db`). HTML pages are gen
 
 ### 2. Adding New Content
 
-**Option A: Using Templates**
-1. Copy template from `docs/templates/`
-2. Fill in your content
-3. Process via Python tools
+**Option A: Using Dynamic Templates**
+1. Use template from `docs/templates/` as structure reference
+2. Replace {{variable}} placeholders with actual content
+3. Process via content management tools
 4. Sync to generate HTML
 
 **Option B: Direct Database**
@@ -300,31 +300,31 @@ python3 content_manager.py  # Use GUI stats panel
 
 ## 🎨 Content Templates
 
-Complete templates available in `docs/templates/`:
-
-### Author Template (`author_template.txt`)
-- Profile information fields
-- Social media links
-- Extended biography section
-- Complete example included
-
-### Category Template (`category_template.txt`)
-- Category metadata
-- Description and keywords
-- Extended description content
-- Creator economy example
-
-### Trending Template (`trending_template.txt`)
-- Heat scores and metrics
-- Platform mention tracking
-- Detailed trend analysis
-- Virtual collaboration example
+Dynamic templates available in `docs/templates/` using the new granular template system:
 
 ### Article Template (`article_template.txt`)
-- Article metadata and formatting
-- Special content elements
-- Rich formatting options
-- TikTok creator fund example
+- Dynamic field placeholders ({{article.title}}, {{article.content}}, etc.)
+- Formatting guidelines and options
+- Template usage instructions
+- Supports all article metadata fields
+
+### Author Template (`author_template.txt`)
+- Dynamic author fields ({{author.name}}, {{author.bio}}, etc.)
+- Profile information structure
+- Social media link formatting
+- Extended biography guidelines
+
+### Category Template (`category_template.txt`)
+- Dynamic category fields ({{category.name}}, {{category.description}}, etc.)
+- Color and icon specifications
+- Hierarchical category support
+- Extended description framework
+
+### Trending Template (`trending_template.txt`)
+- Dynamic trending fields ({{trending.title}}, {{trending.heat_score}}, etc.)
+- Heat score and momentum tracking
+- Analysis content structure
+- Deprecated field references for migration
 
 ## 🔧 Advanced Management
 
